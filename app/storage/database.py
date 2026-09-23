@@ -4,6 +4,7 @@ Stores projects, jobs, render history, and app metadata.
 """
 
 import sqlite3
+import threading
 import json
 import time
 import logging
@@ -23,34 +24,37 @@ class Database:
     def __init__(self, db_path: Path):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = threading.RLock()
         self._conn: Optional[sqlite3.Connection] = None
         self._init_db()
 
     def _get_conn(self) -> sqlite3.Connection:
-        if self._conn is None:
-            self._conn = sqlite3.connect(
-                str(self.db_path),
-                check_same_thread=False,
-                timeout=30,
-            )
-            self._conn.row_factory = sqlite3.Row
-            self._conn.execute("PRAGMA journal_mode=WAL")
-            self._conn.execute("PRAGMA foreign_keys=ON")
-        return self._conn
+        with self._lock:
+            if self._conn is None:
+                self._conn = sqlite3.connect(
+                    str(self.db_path),
+                    check_same_thread=False,
+                    timeout=30,
+                )
+                self._conn.row_factory = sqlite3.Row
+                self._conn.execute("PRAGMA journal_mode=WAL")
+                self._conn.execute("PRAGMA foreign_keys=ON")
+            return self._conn
 
     @contextmanager
     def _cursor(self):
-        conn = self._get_conn()
-        cur = conn.cursor()
-        try:
-            yield cur
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            log.error(f"DB error: {e}")
-            raise
-        finally:
-            cur.close()
+        with self._lock:
+            conn = self._get_conn()
+            cur = conn.cursor()
+            try:
+                yield cur
+                conn.commit()
+            except Exception as e:
+                conn.rollback()
+                log.error(f"DB error: {e}")
+                raise
+            finally:
+                cur.close()
 
     def _init_db(self):
         with self._cursor() as cur:

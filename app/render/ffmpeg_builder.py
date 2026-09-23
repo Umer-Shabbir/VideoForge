@@ -88,6 +88,8 @@ def build_render_command(
 
         if profile.fit_mode == FitMode.BLUR_BG:
             # Blur-bg needs a multi-stage filter with unique label suffixes per slot
+            # Here we first blur the background, then overlay the sharp foreground,
+            # and finally apply the motion (zoompan) on the combined padded result.
             uid = f"s{i}"
             full_filter = (
                 f"[{i}:v]split=2[bg{uid}][fg{uid}];"
@@ -95,9 +97,15 @@ def build_render_command(
                 f"crop={w}:{h},gblur=sigma=25[blurred{uid}];"
                 f"[fg{uid}]scale={w}:{h}:force_original_aspect_ratio=decrease,"
                 f"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=black@0[sharp{uid}];"
-                f"[blurred{uid}][sharp{uid}]overlay=(W-w)/2:(H-h)/2,setsar=1,"
-                f"{motion_filter},fps={fps}[v{i}]"
+                f"[blurred{uid}][sharp{uid}]overlay=(W-w)/2:(H-h)/2[combined{uid}];"
             )
+            if slot.motion.motion_type == MotionType.NONE or slot.motion.intensity <= 0:
+                full_filter += f"[combined{uid}]setsar=1,fps={fps}[v{i}]"
+            else:
+                # To apply motion without destroying the blur composition, we apply zoompan
+                # Rebuild zoompan filter exactly for this stream
+                zm_filter = build_zoompan_filter(slot.motion, seg_frames, w, h, fps)
+                full_filter += f"[combined{uid}]{zm_filter},fps={fps}[v{i}]"
         elif slot.motion.motion_type == MotionType.NONE:
             # Static: just fit + setsar
             fit_filter = _build_fit_filter(profile.fit_mode, w, h)
@@ -105,7 +113,11 @@ def build_render_command(
         else:
             # Motion: zoompan already starts with scale×2 + crop, then zoom
             # No pre-fit needed — zoompan handles source scaling internally
-            full_filter = f"[{i}:v]{motion_filter},fps={fps}[v{i}]"
+            # For Contain, we pad to maintain ratio before scaling up for zoompan
+            fit_pad = ""
+            if profile.fit_mode == FitMode.CONTAIN:
+                fit_pad = f"scale={w}:{h}:force_original_aspect_ratio=decrease,pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=black,"
+            full_filter = f"[{i}:v]{fit_pad}{motion_filter},fps={fps}[v{i}]"
 
         filter_parts.append(full_filter)
         video_labels.append(f"[v{i}]")

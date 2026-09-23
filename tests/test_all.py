@@ -430,7 +430,7 @@ def test_timeline_timing_is_sequential():
 
 
 def test_timeline_motion_variety():
-    from app.render.timeline import generate_timeline
+    from app.render.timeline import generate_timeline, build_zoompan_filter, MotionParams
     from app.core.project import Project, RenderProfile, MotionType
 
     p = Project()
@@ -438,13 +438,28 @@ def test_timeline_motion_variety():
     p.image_paths = [Path(f"img{i}.jpg") for i in range(8)]
     p.profile = RenderProfile()
     p.profile.fps = 30
+    p.profile.motion_type = MotionType.KEN_BURNS
+    p.profile.motion_intensity = 1.0
 
     slots = generate_timeline(p)
-    # Motion is static-only now (no zoompan); verify slots are generated correctly
     assert len(slots) == 8
+
+    # In KEN_BURNS mode, verify slots get alternating motion types
+    motion_types = [s.motion.motion_type for s in slots]
+    assert len(set(motion_types)) > 1
+    assert MotionType.ZOOM_IN in motion_types
+    assert MotionType.PAN_RIGHT in motion_types
+
     for s in slots:
         assert s.display_duration > 0
         assert s.segment_duration >= s.display_duration
+        # Test zoompan filter generation
+        seg_frames = int(s.segment_duration * p.profile.fps)
+        f_str = build_zoompan_filter(s.motion, seg_frames, 1920, 1080, p.profile.fps)
+        assert "zoompan=" in f_str
+        assert "1920x1080" in f_str
+        assert "setsar=1" in f_str
+
     print("  ✓ test_timeline_motion_variety")
 
 
@@ -1128,11 +1143,11 @@ def test_logger_export():
 def test_zoompan_zoom_in():
     from app.render.timeline import build_zoompan_filter, MotionParams
     from app.core.project import MotionType
-    # Motion is now static-only; build_zoompan_filter returns a simple scale filter
-    motion = MotionParams(motion_type=MotionType.NONE)
+    motion = MotionParams(motion_type=MotionType.ZOOM_IN, intensity=1.0)
     filt = build_zoompan_filter(motion, 90, 1920, 1080, 30)
-    assert "1920" in filt and "1080" in filt
-    assert "scale" in filt
+    assert "zoompan=" in filt
+    assert "1920x1080" in filt
+    assert "min(zoom+" in filt
     print("  ✓ test_zoompan_zoom_in")
 
 
@@ -1149,10 +1164,11 @@ def test_zoompan_static():
 def test_zoompan_pan_left():
     from app.render.timeline import build_zoompan_filter, MotionParams
     from app.core.project import MotionType
-    motion = MotionParams(motion_type=MotionType.NONE)
+    motion = MotionParams(motion_type=MotionType.PAN_LEFT, intensity=1.0)
     filt = build_zoompan_filter(motion, 90, 1920, 1080, 30)
-    assert "1920" in filt and "1080" in filt
-    assert "scale" in filt
+    assert "zoompan=" in filt
+    assert "1920x1080" in filt
+    assert "1.0-on/90" in filt
     print("  ✓ test_zoompan_pan_left")
 
 

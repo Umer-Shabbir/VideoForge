@@ -163,9 +163,23 @@ def render_project(
             _cleanup(temp_out, subtitle_path, temp_dir)
             raise RenderError("Output file missing or empty")
 
-        if final_out.exists():
-            final_out.unlink()
-        shutil.move(str(temp_out), str(final_out))
+        move_success = False
+        last_move_err = None
+        for attempt in range(5):
+            try:
+                if final_out.exists():
+                    final_out.unlink()
+                shutil.move(str(temp_out), str(final_out))
+                move_success = True
+                break
+            except (PermissionError, OSError) as e:
+                last_move_err = e
+                time.sleep(0.1)
+
+        if not move_success:
+            _cleanup(temp_out, subtitle_path, temp_dir)
+            raise RenderError(f"Failed to finalize output file: {last_move_err}")
+
         _cleanup(None, subtitle_path, temp_dir)
 
         metrics.finished_at      = time.time()

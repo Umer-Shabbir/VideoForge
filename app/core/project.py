@@ -31,10 +31,16 @@ class TransitionType(str, Enum):
     WIPE_RIGHT = "wiperight"
     SLIDE_LEFT = "slideleft"
     SLIDE_RIGHT = "slideright"
+    SLIDE_UP = "slideup"
+    SLIDE_DOWN = "slidedown"
     CIRCLECROP = "circlecrop"
     DISSOLVE = "dissolve"
     PIXELIZE = "pixelize"
     RADIAL = "radial"
+    HBLUR = "hblur"
+    SQUEEZE_V = "squeezev"
+    SQUEEZE_H = "squeezeh"
+    ZOOM_IN = "zoomin"
     NONE = "none"
 
 

@@ -256,6 +256,9 @@ def align_whisper_segments(
     if not timed_words:
         return []
 
+    # Pre-compute cleaned lowercase alphanumeric strings for timed_words
+    timed_words_clean = [re.sub(r'[^\w]', '', w["word"].lower()) for w in timed_words]
+
     full_text = " ".join(w["word"] for w in timed_words)
 
     # ── Decide chunk size for karaoke / viral mode ────────────────────────────
@@ -289,6 +292,8 @@ def align_whisper_segments(
         if word_idx >= total_timed:
             break  # exhausted timed words — remaining chunks get no timing
 
+        chunk_words_clean = [re.sub(r'[^\w]', '', w.lower()) for w in chunk_words]
+
         start_time      = None
         end_time        = None
         matched         = 0
@@ -299,11 +304,8 @@ def align_whisper_segments(
 
         for i in range(word_idx, search_limit):
             tw       = timed_words[i]
-            tw_clean = re.sub(r'[^\w]', '', tw["word"].lower())
-            ck_clean = (
-                re.sub(r'[^\w]', '', chunk_words[matched].lower())
-                if matched < len(chunk_words) else ""
-            )
+            tw_clean = timed_words_clean[i]
+            ck_clean = chunk_words_clean[matched] if matched < len(chunk_words_clean) else ""
 
             is_match = bool(
                 tw_clean and ck_clean and (

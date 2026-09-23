@@ -307,5 +307,10 @@ class AppState(QObject):
             # Wait up to 8 s for any running render to reach a safe stopping point
             if hasattr(self.queue, "wait_for_all_workers"):
                 self.queue.wait_for_all_workers(timeout_ms=8000)
+        try:
+            from app.subtitles.aligner import clear_model_cache
+            clear_model_cache()
+        except Exception as e:
+            log.warning(f"Error clearing subtitle model cache: {e}")
         if self.db:
             self.db.close()
