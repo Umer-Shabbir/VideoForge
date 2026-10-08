@@ -154,7 +154,7 @@ class SettingsDialog(QDialog):
         ram_gb    = psutil.virtual_memory().total // (1024**3)
 
         info_lbl = QLabel(
-            f"System: {psutil.cpu_count(logical=False)} physical cores "
+            f"System: {psutil.cpu_count(logical=False) or 2} physical cores "
             f"({cpu_count} logical), {ram_gb} GB RAM"
         )
         info_lbl.setStyleSheet(f"color:{COLORS['text_secondary']};font-size:12px;padding:4px;")

@@ -749,7 +749,7 @@ Example templates:
 | File | What it is |
 |------|-----------|
 | `{name}.mp4` | The main output video with burned-in subtitles |
-| `{name}.srt` | Raw subtitle timing file (for external players) |
+| `audio.srt` | Raw subtitle timing file (for external players) |
 
 ### Overwrite protection
 

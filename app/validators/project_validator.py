@@ -1,4 +1,4 @@
-"""
+﻿"""
 Project validator: inspects a project before adding to queue.
 Returns a ValidationResult with detailed issues, warnings, and fix suggestions.
 """
@@ -49,10 +49,13 @@ def validate_project(project: Project, check_files: bool = True) -> ValidationRe
 
     # ── Audio ─────────────────────────────────────────────────────────────────
     if p.audio_path is None:
-        result.add_error(
-            "No audio file found in project folder.",
-            f"Add an audio file ({', '.join(sorted(AUDIO_EXTS))}) to the folder."
-        )
+        if p.folder and ((p.folder / "video.mp4").exists() or (p.folder / f"{p.name}.mp4").exists()):
+            pass
+        else:
+            result.add_error(
+                "No audio file found in project folder.",
+                f"Add an audio file ({', '.join(sorted(AUDIO_EXTS))}) to the folder."
+            )
     else:
         if check_files:
             if not p.audio_path.exists():
@@ -216,3 +219,6 @@ def quick_validate_folder(folder: Path) -> tuple[bool, list[str]]:
         issues.append("No image files found")
 
     return has_audio and has_image, issues
+
+
+

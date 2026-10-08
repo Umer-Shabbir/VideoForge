@@ -23,10 +23,11 @@ from app.gui.widgets.common import StatusBadge, HealthBar, Divider
 class ProjectDetailDialog(QDialog):
     project_updated = Signal(object)   # Project
 
-    def __init__(self, project: Project, presets: dict = None, parent=None):
+    def __init__(self, project: Project, presets: dict | None = None, parent=None):
         super().__init__(parent)
         self.project = project
         self.presets = presets or {}
+        setattr(self.project, "_queue_after_save", getattr(project, "_queue_after_save", False))
         self.setWindowTitle(f"Project Settings — {project.name}")
         self.setMinimumSize(760, 640)
         self.setModal(True)
@@ -664,6 +665,7 @@ class ProjectDetailDialog(QDialog):
 
     def _save_and_queue(self):
         self._collect_values()
-        self.project_updated.emit(self.project)
-        self.project._queue_after_save = True
+        project_to_update = self.project
+        setattr(project_to_update, "_queue_after_save", True)
+        self.project_updated.emit(project_to_update)
         self.accept()

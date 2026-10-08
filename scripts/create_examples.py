@@ -140,7 +140,7 @@ def create_example_projects(output_dir: Path) -> list[Path]:
         _make_gradient_png(p2 / fname, 1080, 1920, c1, c2, lbl)
 
     # Also include an SRT transcript variant
-    (p2 / "captions.srt").write_text(
+    (p2 / "audio.srt").write_text(
         "1\n00:00:00,000 --> 00:00:01,500\nIntroducing the future.\n\n"
         "2\n00:00:01,800 --> 00:00:04,000\nWe built something that changes everything.\n\n"
         "3\n00:00:04,200 --> 00:00:06,500\nFaster. Smarter. More powerful.\n\n"

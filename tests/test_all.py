@@ -841,10 +841,10 @@ def test_settings_presets():
     # Built-in presets
     presets = sm.list_presets()
     assert len(presets) >= 4
-    assert "YouTube HD (16:9)" in presets
+    assert "blueprint" in presets
 
     # Get preset
-    pr = sm.get_preset("YouTube HD (16:9)")
+    pr = sm.get_preset("blueprint")
     assert pr is not None
     assert pr.width == 1920
     assert pr.height == 1080

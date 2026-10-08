@@ -64,6 +64,7 @@ def align_subtitles(
                 whisper_language=_get_whisper_language_setting(),
                 progress_callback=progress_callback,
                 cancel_flag=cancel_flag,
+                transcript_segments=getattr(project, "transcript_segments", [])
             )
             if chunks:
                 log.info(f"[{project.name}] Whisper alignment produced {len(chunks)} subtitle chunks")
@@ -176,6 +177,7 @@ def _align_with_whisper(
     whisper_language=None,
     progress_callback: Optional[Callable] = None,
     cancel_flag=None,
+    transcript_segments=None,
 ) -> list[SubtitleChunk]:
     """
     Run faster-whisper on audio, then align the provided text to the output.
@@ -247,6 +249,7 @@ def _align_with_whisper(
         mode=subtitle_mode,
         max_chars=max_chars,
         max_lines=max_lines,
+        transcript_segments=transcript_segments,
     )
 
     return chunks

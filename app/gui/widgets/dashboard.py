@@ -1,4 +1,4 @@
-"""
+﻿"""
 Dashboard panel: shows overview stats, quick-action buttons, and recent activity.
 """
 
@@ -107,7 +107,7 @@ class DashboardPanel(QWidget):
         actions_row = QHBoxLayout()
         actions_row.setSpacing(10)
 
-        btn_add = QPushButton("  ＋  Add Folders")
+        btn_add = QPushButton("  ＋  Select Master Output Folder")
         btn_add.setObjectName("primary")
         btn_add.setFixedHeight(40)
         btn_add.clicked.connect(self.add_folders_clicked)
@@ -220,3 +220,4 @@ class DashboardPanel(QWidget):
     def _auto_refresh(self):
         """Emit a refresh request — parent connects this."""
         pass
+

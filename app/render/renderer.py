@@ -105,7 +105,7 @@ def render_project(
                     write_ass_file(sub_chunks, subtitle_path, project.profile,
                                    project.audio_duration or 0.0)
                     if save_srt:
-                        srt = final_out.with_suffix(".srt")
+                        srt = final_out.with_name("audio.srt")
                         write_srt_file(sub_chunks, srt)
                         log.info(f"SRT saved: {srt}")
             except Exception as e:
@@ -249,6 +249,12 @@ def _build_command(project, slots, subtitle_path, output_path, ffmpeg_bin, ffmpe
     audio_idx = n
     cmd += ["-i", str(project.audio_path)]
 
+    # ── Input: bgm (optional) ────────────────────────────────────────────────
+    bgm_idx = None
+    if getattr(project, "bgm_path", None) and project.bgm_path.exists():
+        bgm_idx = audio_idx + 1
+        cmd += ["-stream_loop", "-1", "-i", str(project.bgm_path)]
+
     # ── filter_complex ────────────────────────────────────────────────────────
     fc_parts = []
 
@@ -264,7 +270,7 @@ def _build_command(project, slots, subtitle_path, output_path, ffmpeg_bin, ffmpe
         final_video = _xfade_chain(fc_parts, n, slots, trans, trans_dur)
 
     # Audio filter
-    af = _audio_filter(audio_idx, audio_dur, pr)
+    af = _audio_filter(audio_idx, audio_dur, pr, bgm_idx=bgm_idx)
     fc_parts.append(af)
 
     # ── Subtitle burn-in: MUST be inside filter_complex, not -vf ─────────────
@@ -337,7 +343,7 @@ def _xfade_chain(fc_parts: list, n: int, slots, trans: str, trans_dur: float) ->
     return prev_label
 
 
-def _audio_filter(audio_idx: int, audio_dur: float, pr) -> str:
+def _audio_filter(audio_idx: int, audio_dur: float, pr, bgm_idx: int = None) -> str:
     parts = []
     if pr.normalize_audio:
         parts.append("loudnorm=I=-16:TP=-1.5:LRA=11")
@@ -346,6 +352,26 @@ def _audio_filter(audio_idx: int, audio_dur: float, pr) -> str:
     if pr.audio_fade_out > 0 and audio_dur > pr.audio_fade_out:
         parts.append(f"afade=t=out:st={audio_dur - pr.audio_fade_out:.3f}:d={pr.audio_fade_out:.2f}")
     inner = ",".join(parts) if parts else "anull"
+
+    if bgm_idx is not None:
+        bgm_vol = getattr(pr, "bgm_volume", 0.1)
+        bgm_fi = getattr(pr, "bgm_fade_in", 2.0)
+        bgm_fo = getattr(pr, "bgm_fade_out", 3.0)
+
+        bgm_parts = [f"volume={bgm_vol}"]
+        if bgm_fi > 0:
+            bgm_parts.append(f"afade=t=in:st=0:d={bgm_fi:.2f}")
+        if bgm_fo > 0 and audio_dur > bgm_fo:
+            bgm_parts.append(f"afade=t=out:st={audio_dur - bgm_fo:.3f}:d={bgm_fo:.2f}")
+        bgm_inner = ",".join(bgm_parts)
+
+        return (
+            f"[{audio_idx}:a]{inner},asplit=2[main_a][main_side]; "
+            f"[{bgm_idx}:a]{bgm_inner}[bgm_a]; "
+            f"[bgm_a][main_side]sidechaincompress=threshold=0.08:ratio=4:attack=5:release=50[bgm_ducked]; "
+            f"[main_a][bgm_ducked]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+        )
+
     return f"[{audio_idx}:a]{inner}[aout]"
 
 

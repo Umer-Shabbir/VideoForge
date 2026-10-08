@@ -1,4 +1,4 @@
-"""
+﻿"""
 Project scanner service: takes a folder path, finds valid project folders,
 and creates Project objects with detected files and metadata.
 """
@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 from app.core.project import Project, ProjectStatus, RenderProfile
-from app.utils.file_utils import detect_project_files, read_transcript_text, scan_for_project_folders
+from app.utils.file_utils import detect_project_files, read_transcript_segments, scan_for_project_folders
 from app.utils.ffmpeg_utils import get_audio_duration
 from app.validators.project_validator import validate_project
 
@@ -141,7 +141,9 @@ class ProjectScanner:
         )
 
         # Check for metadata.json to resolve matching preset
-        meta_file = folder / "metadata.json"
+        meta_file = folder / "project.json"
+        if not meta_file.exists():
+            meta_file = folder / "metadata.json"
         resolved_preset_name = ""
         if meta_file.exists():
             import json
@@ -167,6 +169,7 @@ class ProjectScanner:
 
         # Set files
         project.audio_path = detected.get("audio")
+        project.bgm_path = detected.get("bgm")
         project.transcript_path = detected.get("transcript")
         project.image_paths = detected.get("images", [])
 
@@ -181,8 +184,11 @@ class ProjectScanner:
         # Read transcript text
         if project.transcript_path:
             try:
-                text = read_transcript_text(project.transcript_path)
+                from app.utils.file_utils import read_transcript_segments
+                text, segments = read_transcript_segments(project.transcript_path)
                 project.transcript_text = text
+                if segments:
+                    project.transcript_segments = segments
                 if text:
                     project.transcript_word_count = len(text.split())
             except Exception as e:
@@ -240,3 +246,7 @@ def make_scanner_from_settings(settings) -> "ProjectScanner":
                                      "script,transcript,narration,text"),
         settings_manager=settings,
     )
+
+
+
+

@@ -246,48 +246,19 @@ class SettingsManager:
 
     @staticmethod
     def _default_presets() -> dict:
-        """Built-in presets shipped with the application."""
+        """Built-in presets, loaded dynamically from registry and merged with hardcoded fallback defaults."""
         presets = {}
 
-        # YouTube / 16:9 HD
-        p = RenderProfile()
-        p.width, p.height = 1920, 1080
-        p.fps = 30
-        p.video_bitrate = "6M"
-        p.crf = 20
-        p.subtitle_mode = SubtitleMode.CLASSIC
-        p.subtitle_font_size = 64
-        p.transition_type = TransitionType.FADE
-        p.motion_type = MotionType.KEN_BURNS
-        presets["YouTube HD (16:9)"] = p.to_dict()
-
-        # Reels / Shorts 9:16
-        p2 = RenderProfile()
-        p2.width, p2.height = 1080, 1920
-        p2.fps = 30
-        p2.video_bitrate = "4M"
-        p2.subtitle_mode = SubtitleMode.VIRAL
-        p2.subtitle_font_size = 80
-        p2.subtitle_margin_v = 200
-        p2.transition_type = TransitionType.FADE
-        p2.motion_type = MotionType.KEN_BURNS
-        presets["Reels / Shorts (9:16)"] = p2.to_dict()
-
-        # Square Instagram
-        p3 = RenderProfile()
-        p3.width, p3.height = 1080, 1080
-        p3.fps = 30
-        p3.subtitle_mode = SubtitleMode.PHRASE
-        p3.transition_type = TransitionType.DISSOLVE
-        presets["Instagram Square (1:1)"] = p3.to_dict()
-
+        # Default fallback FFmpeg presets
+        from app.core.project import RenderProfile, SubtitleMode, TransitionType, MotionType
+        
         # Fast preview
         p4 = RenderProfile()
         p4.width, p4.height = 1280, 720
         p4.fps = 24
         p4.video_bitrate = "2M"
         p4.crf = 28
-        p4.preset_name = "ultrafast"
+        p4.preset_name = "ultrafast"  # ffmpeg preset
         p4.motion_type = MotionType.NONE
         p4.subtitle_mode = SubtitleMode.CLASSIC
         presets["Fast Preview (720p)"] = p4.to_dict()
@@ -298,10 +269,57 @@ class SettingsManager:
         p5.fps = 30
         p5.video_bitrate = "10M"
         p5.crf = 16
-        p5.preset_name = "slow"
+        p5.preset_name = "slow"  # ffmpeg preset
         p5.motion_type = MotionType.KEN_BURNS
         p5.motion_intensity = 1.5
         presets["High Quality Archive"] = p5.to_dict()
+
+        # Try load master registry
+        try:
+            import json
+            registry_path = Path("H:/Automation/Presets/master_presets_registry.json")
+            if registry_path.exists():
+                data = json.loads(registry_path.read_text(encoding="utf-8"))
+                for slug, item in data.items():
+                    vf = item.get("video_forge", {})
+                    p = RenderProfile()
+                    
+                    # Basic 16:9 Defaults
+                    p.width, p.height = 1920, 1080
+                    p.fps = 30
+                    p.video_bitrate = "6M"
+                    p.crf = 20
+                    
+                    # Mappings from master registry
+                    transitions_list = vf.get("allowed_transitions", [])
+                    p.transition_type = TransitionType.FADE # default
+                    if "cut" in transitions_list and len(transitions_list) == 1:
+                        p.transition_type = TransitionType.CUT
+                    elif "dissolve" in transitions_list:
+                        p.transition_type = TransitionType.DISSOLVE
+
+                    sub_mode = vf.get("sub_mode", "phrase")
+                    if sub_mode == "phrase":
+                        p.subtitle_mode = SubtitleMode.PHRASE
+                    elif sub_mode == "viral":
+                        p.subtitle_mode = SubtitleMode.VIRAL
+                    elif sub_mode == "karaoke":
+                        p.subtitle_mode = SubtitleMode.KARAOKE
+                    else:
+                        p.subtitle_mode = SubtitleMode.CLASSIC
+                        
+                    p.subtitle_font = vf.get("subtitle_font", "Arial-Bold")
+                    p.subtitle_primary_color = vf.get("subtitle_primary_color", "&H00FFFFFF")
+                    p.subtitle_outline_color = vf.get("subtitle_outline_color", "&H00000000")
+                    
+                    if vf.get("sub_position") == "bottom_center":
+                        p.subtitle_margin_v = 80
+                    elif vf.get("sub_position") == "center":
+                        p.subtitle_margin_v = 500
+                        
+                    presets[slug] = p.to_dict()
+        except Exception as e:
+            log.error(f"Failed to load master registry presets: {e}")
 
         return presets
 

@@ -21,6 +21,7 @@ class SubtitleChunk:
     words: list[str] = field(default_factory=list)
     word_starts: list[float] = field(default_factory=list)
     word_ends: list[float] = field(default_factory=list)
+    speaker: Optional[str] = None    # identified speaker for this chunk
 
     @property
     def duration(self) -> Optional[float]:
@@ -219,6 +220,7 @@ def align_whisper_segments(
     mode: SubtitleMode,
     max_chars: int = 42,
     max_lines: int = 2,
+    transcript_segments: Optional[list[dict]] = None,
 ) -> list[SubtitleChunk]:
     """
     Convert whisper segments (with word-level timestamps) into subtitle chunks.
@@ -256,6 +258,38 @@ def align_whisper_segments(
     if not timed_words:
         return []
 
+    # Assign speakers to timed words if transcript segments exist
+    if transcript_segments:
+        # Flatten transcript into a list of (word, speaker)
+        ts_words = []
+        for seg in transcript_segments:
+            spk = seg.get("speaker")
+            wds = seg.get("text", "").split()
+            for w in wds:
+                ts_words.append((w, spk))
+
+        # Simple parallel walk to assign speakers to timed_words
+        ts_idx = 0
+        ts_len = len(ts_words)
+        for tw in timed_words:
+            w_clean = re.sub(r'[^\w]', '', tw["word"].lower())
+            # Look ahead slightly in ts_words to resync
+            assigned_spk = None
+            for offset in range(min(5, ts_len - ts_idx)):
+                ts_w, ts_spk = ts_words[ts_idx + offset]
+                ts_w_clean = re.sub(r'[^\w]', '', ts_w.lower())
+                if (w_clean == ts_w_clean) or (len(w_clean) > 2 and (w_clean in ts_w_clean or ts_w_clean in w_clean)):
+                    assigned_spk = ts_spk
+                    ts_idx += offset + 1
+                    break
+
+            # If no match found within window, just use the last known or next available speaker
+            if not assigned_spk and ts_idx < ts_len:
+                assigned_spk = ts_words[ts_idx][1]
+                ts_idx += 1
+
+            tw["speaker"] = assigned_spk
+
     # Pre-compute cleaned lowercase alphanumeric strings for timed_words
     timed_words_clean = [re.sub(r'[^\w]', '', w["word"].lower()) for w in timed_words]
 
@@ -269,7 +303,17 @@ def align_whisper_segments(
         # short enough to read while the highlight moves through it
         actual_mode = _SM.VIRAL
 
-    display_chunks = segment_text(full_text, actual_mode, max_chars, max_lines)
+    display_chunks = []  # List of dict: {"text": str, "speaker": Optional[str]}
+    if transcript_segments:
+        for seg in transcript_segments:
+            seg_chunks = segment_text(seg["text"], actual_mode, max_chars, max_lines)
+            for chunk_text in seg_chunks:
+                display_chunks.append({"text": chunk_text, "speaker": seg.get("speaker")})
+    else:
+        seg_chunks = segment_text(full_text, actual_mode, max_chars, max_lines)
+        for chunk_text in seg_chunks:
+            display_chunks.append({"text": chunk_text, "speaker": None})
+
     if not display_chunks:
         return []
 
@@ -285,7 +329,9 @@ def align_whisper_segments(
     word_idx = 0
     total_timed = len(timed_words)
 
-    for chunk_text in display_chunks:
+    for chunk_dict in display_chunks:
+        chunk_text = chunk_dict["text"]
+        chunk_speaker = chunk_dict["speaker"]
         chunk_words = chunk_text.split()
         if not chunk_words:
             continue
@@ -365,6 +411,7 @@ def align_whisper_segments(
             words=[w["word"] for w in chunk_word_data],
             word_starts=[w["start"] for w in chunk_word_data],
             word_ends=[w["end"]   for w in chunk_word_data],
+            speaker=chunk_speaker,
         )
         result.append(chunk)
 

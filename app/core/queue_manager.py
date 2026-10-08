@@ -248,7 +248,7 @@ class QueueManager(QObject):
         if not completed:
             return None
 
-        avg_time = sum(j.elapsed_time() for j in completed) / len(completed)
+        avg_time = sum([j.elapsed_time() for j in completed if j.elapsed_time() is not None]) / len(completed)
         return avg_time * len(pending)
 
     # ─── Internal ─────────────────────────────────────────────────────────────

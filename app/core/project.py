@@ -141,6 +141,10 @@ class RenderProfile:
     normalize_audio: bool = True
     audio_fade_in: float = 0.5
     audio_fade_out: float = 1.0
+    bgm_volume: float = 0.1  # Volume (0.0 to 1.0) for Background Music (ducking)
+    bgm_fade_in: float = 2.0
+    bgm_fade_out: float = 3.0
+    bgm_volume: float = 0.1  # 0.0 to 1.0, ducking volume
 
     def to_dict(self) -> dict:
         d = {}
@@ -212,12 +216,14 @@ class Project:
 
     # Detected files
     audio_path: Optional[Path] = None
+    bgm_path: Optional[Path] = None
     transcript_path: Optional[Path] = None
     image_paths: list[Path] = field(default_factory=list)
 
     # Detected metadata
     audio_duration: Optional[float] = None
     transcript_text: Optional[str] = None
+    transcript_segments: list[dict] = field(default_factory=list) # [{"speaker": "A", "text": "..."}]
     transcript_word_count: int = 0
 
     # Status
@@ -283,6 +289,7 @@ class Project:
             "folder": str(self.folder),
             "name": self.name,
             "audio_path": str(self.audio_path) if self.audio_path else None,
+            "bgm_path": str(self.bgm_path) if self.bgm_path else None,
             "transcript_path": str(self.transcript_path) if self.transcript_path else None,
             "image_paths": [str(p) for p in self.image_paths],
             "audio_duration": self.audio_duration,
@@ -307,6 +314,7 @@ class Project:
         p.folder = Path(data.get("folder", ""))
         p.name = data.get("name", "")
         p.audio_path = Path(data["audio_path"]) if data.get("audio_path") else None
+        p.bgm_path = Path(data["bgm_path"]) if data.get("bgm_path") else None
         p.transcript_path = Path(data["transcript_path"]) if data.get("transcript_path") else None
         p.image_paths = [Path(x) for x in data.get("image_paths", [])]
         p.audio_duration = data.get("audio_duration")

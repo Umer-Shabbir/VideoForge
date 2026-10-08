@@ -71,10 +71,16 @@ def build_render_command(
     audio_idx = n + len(extra_inputs)
     cmd.extend(["-i", _fp(project.audio_path)])
 
+    # ── Input: BGM (optional) ─────────────────────────────────────────────────
+    bgm_idx = None
+    if getattr(project, "bgm_path", None) and project.bgm_path.exists():
+        bgm_idx = audio_idx + 1
+        cmd.extend(["-stream_loop", "-1", "-i", _fp(project.bgm_path)])
+
     # ── Input: Watermark (optional) ───────────────────────────────────────────
     watermark_idx = None
     if profile.watermark_enabled and profile.watermark_path and Path(profile.watermark_path).exists():
-        watermark_idx = audio_idx + 1
+        watermark_idx = audio_idx + 1 if bgm_idx is None else bgm_idx + 1
         cmd.extend(["-i", _fp(Path(profile.watermark_path))])
 
     # ── Filter Complex ────────────────────────────────────────────────────────
@@ -150,7 +156,7 @@ def build_render_command(
 
     # Audio processing
     audio_filter = _build_audio_filter(
-        audio_idx, project.audio_duration or 0.0, profile
+        audio_idx, project.audio_duration or 0.0, profile, bgm_idx
     )
     filter_parts.append(audio_filter)
     audio_out_label = "aout"
@@ -308,25 +314,43 @@ def _build_audio_filter(
     audio_idx: int,
     audio_duration: float,
     profile: RenderProfile,
+    bgm_idx: Optional[int] = None,
 ) -> str:
     """Build audio processing filter (normalize, fade in/out)."""
-    parts = [f"[{audio_idx}:a]"]
-
-    filters = []
+    parts = []
     if profile.normalize_audio:
-        filters.append("loudnorm=I=-16:TP=-1.5:LRA=11")
+        parts.append("loudnorm=I=-16:TP=-1.5:LRA=11")
 
     fade_in = profile.audio_fade_in
     fade_out = profile.audio_fade_out
     if fade_in > 0:
-        filters.append(f"afade=t=in:st=0:d={fade_in:.2f}")
+        parts.append(f"afade=t=in:st=0:d={fade_in:.2f}")
     if fade_out > 0 and audio_duration > fade_out:
-        filters.append(f"afade=t=out:st={audio_duration - fade_out:.3f}:d={fade_out:.2f}")
+        parts.append(f"afade=t=out:st={audio_duration - fade_out:.3f}:d={fade_out:.2f}")
 
-    if filters:
-        return "".join(parts) + ",".join(filters) + "[aout]"
-    else:
-        return f"[{audio_idx}:a]anull[aout]"
+    inner = ",".join(parts) if parts else "anull"
+
+    if bgm_idx is not None:
+        bgm_vol = getattr(profile, "bgm_volume", 0.1)
+        bgm_fi = getattr(profile, "bgm_fade_in", 2.0)
+        bgm_fo = getattr(profile, "bgm_fade_out", 3.0)
+
+        bgm_parts = [f"volume={bgm_vol}"]
+        if bgm_fi > 0:
+            bgm_parts.append(f"afade=t=in:st=0:d={bgm_fi:.2f}")
+        if bgm_fo > 0 and audio_duration > bgm_fo:
+            bgm_parts.append(f"afade=t=out:st={audio_duration - bgm_fo:.3f}:d={bgm_fo:.2f}")
+        bgm_inner = ",".join(bgm_parts)
+
+        # Audio ducking using sidechaincompress mapping
+        return (
+            f"[{audio_idx}:a]{inner},asplit=2[main_a][main_side]; "
+            f"[{bgm_idx}:a]{bgm_inner}[bgm_a]; "
+            f"[bgm_a][main_side]sidechaincompress=threshold=0.08:ratio=4:attack=5:release=50[bgm_ducked]; "
+            f"[main_a][bgm_ducked]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+        )
+
+    return f"[{audio_idx}:a]{inner}[aout]"
 
 
 def _build_watermark_filter(

@@ -1,3 +1,27 @@
+from typing import Optional
+from typing import Optional, List
+from app.core.project import RenderProfile, SubtitleMode
+from app.core.project import RenderProfile, SubtitleMode
+
+# Fallback colors for speakers when multi-speaker mode is used
+SPEAKER_COLORS = [
+    "&H00FFFFFF",  # White
+    "&H00FFFF00",  # Cyan
+    "&H00AAAAFF",  # Light Red/Pink
+    "&H00AAFFAA",  # Light Green
+    "&H00FFAAFF",  # Magenta
+    "&H0000AAFF"   # Orange
+]
+
+def _get_speaker_color(speaker: str, profile: RenderProfile) -> str:
+    if not speaker:
+        return profile.subtitle_primary_color
+        
+    # Hash the speaker string to always get the same color for same speaker
+    import hashlib
+    h = int(hashlib.md5(speaker.encode()).hexdigest(), 16)
+    idx = h % len(SPEAKER_COLORS)
+    return SPEAKER_COLORS[idx]
 """
 Subtitle styler — generates polished ASS subtitle files.
 
@@ -242,6 +266,9 @@ def _standard_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> lis
         if chunk.start is None or chunk.end is None or chunk.end <= chunk.start:
             continue
         text = _wrap(_esc(chunk.text), max_chars)
+        if chunk.speaker:
+            spk_color = _ass_color_to_bbggrr(_get_speaker_color(chunk.speaker, profile))
+            text = f"{{\\1c&H{spk_color}&}}\\b1{chunk.speaker}:\\b0 {text}"
         events.append(
             f"Dialogue: 0,{_ass_time(chunk.start)},{_ass_time(chunk.end)},"
             f"Default,,0,0,0,,{text}"
@@ -251,6 +278,35 @@ def _standard_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> lis
 
 # ─── Karaoke events ───────────────────────────────────────────────────────────
 
+def _get_speaker_colors(speaker: Optional[str], profile: RenderProfile, assigned_colors: dict) -> tuple[str, str]:
+    """Return (normal_bbggrr, highlight_bbggrr) for a speaker."""
+    base_normal = _ass_color_to_bbggrr(profile.subtitle_primary_color)
+    base_highlight = _ass_color_to_bbggrr(profile.subtitle_karaoke_color)
+
+    if not speaker:
+        return base_normal, base_highlight
+
+    if speaker not in assigned_colors:
+        # Generate a distinct color for this speaker, avoiding the default normal/highlight if possible
+        # We can use a predefined palette
+        palette = [
+            "00FFFF", # Yellow
+            "00FF00", # Green
+            "FF00FF", # Magenta
+            "00A5FF", # Orange
+            "FFFF00", # Cyan
+            "FF0000", # Blue
+            "0000FF", # Red
+        ]
+        # Skip the primary highlight color if it's in the palette to avoid confusion
+        palette = [c for c in palette if c != base_highlight]
+
+        c_idx = len(assigned_colors) % max(1, len(palette))
+        speaker_highlight = palette[c_idx] if palette else base_highlight
+        assigned_colors[speaker] = (base_normal, speaker_highlight)
+
+    return assigned_colors[speaker]
+
 def _karaoke_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> list[str]:
     """
     Generate frame-accurate word-by-word highlight subtitle events.
@@ -258,22 +314,15 @@ def _karaoke_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> list
     For each chunk of N words, produces exactly N Dialogue lines.
     Each line is active only during that word's spoken time window.
     Each line contains the full chunk text with per-word colour override tags.
-    Gap-filling: each word's line extends to the next word's start time,
-    ensuring seamless transitions with no flicker between words.
-
-    No animation tags, no layer stacking, no doubled text.
-    Works correctly with ffmpeg's ASS burn-in renderer.
     """
     events = []
 
-    normal_bbggrr    = _ass_color_to_bbggrr(profile.subtitle_primary_color)
-    highlight_bbggrr = _ass_color_to_bbggrr(profile.subtitle_karaoke_color)
-    normal_tag    = _make_colour_tag(normal_bbggrr)
-    highlight_tag = _make_colour_tag(highlight_bbggrr)
+    assigned_colors = {}
+    base_normal = _ass_color_to_bbggrr(profile.subtitle_primary_color)
+    base_highlight = _ass_color_to_bbggrr(profile.subtitle_karaoke_color)
 
     log.debug(
-        f"Karaoke: normal=&H{normal_bbggrr} "
-        f"highlight=&H{highlight_bbggrr}"
+        f"Karaoke base: normal=&H{base_normal} highlight=&H{base_highlight}"
     )
 
     for chunk in chunks:
@@ -328,7 +377,14 @@ def _karaoke_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> list
             if we - ws < 0.04:
                 we = ws + 0.04
 
+            chunk_normal, chunk_highlight = _get_speaker_colors(chunk.speaker, profile, assigned_colors)
+            normal_tag = _make_colour_tag(chunk_normal)
+            highlight_tag = _make_colour_tag(chunk_highlight)
+
             line_text = _build_karaoke_line(esc_words, i, normal_tag, highlight_tag)
+            if chunk.speaker:
+                speaker_label = f"{{\\1c&H{chunk_normal}&}}\\b1{chunk.speaker}:\\b0 "
+                line_text = speaker_label + line_text
 
             events.append(
                 f"Dialogue: 0,{_ass_time(ws)},{_ass_time(we)},"

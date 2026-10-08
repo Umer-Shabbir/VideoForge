@@ -1,4 +1,4 @@
-"""
+﻿"""
 File and path utilities for VideoForge.
 Handles Windows paths, format detection, and folder scanning.
 """
@@ -8,7 +8,7 @@ import re
 import hashlib
 import shutil
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any, cast
 import logging
 
 log = logging.getLogger("videoforge.file_utils")
@@ -62,7 +62,7 @@ def ensure_dir(path: Path) -> Path:
 def file_size_str(path: Path) -> str:
     """Human-readable file size string."""
     try:
-        size = path.stat().st_size
+        size = float(path.stat().st_size)
         for unit in ["B", "KB", "MB", "GB"]:
             if size < 1024:
                 return f"{size:.1f} {unit}"
@@ -102,18 +102,20 @@ def detect_project_files(folder: Path,
                          preferred_audio: str = "",
                          preferred_script: str = "",
                          audio_keywords: str = "narration,voiceover,audio,voice",
-                         script_keywords: str = "script,transcript,narration,text") -> dict:
+                         script_keywords: str = "script,transcript,narration,text",
+                         bgm_keywords: str = "bgm,music,background,song") -> dict:
     """
-    Scan a folder and detect audio, images, and transcript files.
-    
+    Scan a folder and detect audio, bgm, images, and transcript files.
+
     preferred_audio / preferred_script: exact filename to prefer (e.g. "narration.mp3")
-    audio_keywords / script_keywords: comma-separated keywords to rank candidates
-    
-    Returns dict: {audio, images, transcript, issues}
+    audio_keywords / script_keywords / bgm_keywords: comma-separated keywords to rank candidates
+
+    Returns dict: {audio, bgm, images, transcript, issues}
     """
-    result = {"audio": None, "images": [], "transcript": None, "issues": []}
+    result: dict[str, Any] = {"audio": None, "bgm": None, "images": [], "transcript": None, "issues": []}
+    issues = cast(list[str], result["issues"])
     if not folder.is_dir():
-        result["issues"].append(f"Not a directory: {folder}")
+        issues.append(f"Not a directory: {folder}")
         return result
 
     all_files = list(folder.iterdir())
@@ -148,13 +150,26 @@ def detect_project_files(folder: Path,
         return sorted(candidates, key=lambda f: len(f.stem), reverse=True)[0]
 
     if audio_candidates:
+        # Separate BGM candidates from main audio candidates based on exact exclusions if necessary
+        # However, _pick_audio handles finding the main audio.
+        # Let's find bgm first by running _pick_audio on bgm keywords.
+        bgm_obj = _pick_audio(audio_candidates, "", bgm_keywords)
+        # If the returned object has a bgm keyword match, assign to bgm
+        if bgm_obj and any(kw in bgm_obj.stem.lower() for kw in [k.strip().lower() for k in bgm_keywords.split(",") if k.strip()]):
+            result["bgm"] = bgm_obj
+            # Remove bgm from general audio candidates to avoid it being picked as narration
+            audio_candidates.remove(bgm_obj)
+
+    if audio_candidates:
         result["audio"] = _pick_audio(audio_candidates, preferred_audio, audio_keywords)
         if len(audio_candidates) > 1:
-            result["issues"].append(
-                f"Multiple audio files ({len(audio_candidates)}). Using: {result['audio'].name}"
+            audio_obj = result['audio']
+            name = audio_obj.name if audio_obj else 'unknown'
+            issues.append(
+                f"Multiple audio files ({len(audio_candidates)}). Using main: {name}"
             )
     else:
-        result["issues"].append("No audio file found")
+        issues.append("No main audio file found")
 
     # ── Images ─────────────────────────────────────────────────────────────────
     images_dir = folder / "images"
@@ -167,7 +182,7 @@ def detect_project_files(folder: Path,
 
     result["images"] = image_candidates
     if not image_candidates:
-        result["issues"].append("No image files found")
+        issues.append("No image files found")
 
     # ── Transcript selection ───────────────────────────────────────────────────
     def _pick_transcript(candidates, preferred_name, keywords):
@@ -177,9 +192,14 @@ def detect_project_files(folder: Path,
             return candidates[0]
         # 1) Exact preferred filename match
         if preferred_name:
+            # Check specifically for audio.srt first if requested or general
             for f in candidates:
                 if f.name.lower() == preferred_name.lower():
                     return f
+        # Priority for the unified standard name
+        for f in candidates:
+            if f.name.lower() == "audio.srt":
+                return f
         # 2) Keyword match
         for kw in [k.strip().lower() for k in keywords.split(",") if k.strip()]:
             for f in candidates:
@@ -195,11 +215,13 @@ def detect_project_files(folder: Path,
     if transcript_candidates:
         result["transcript"] = _pick_transcript(transcript_candidates, preferred_script, script_keywords)
         if len(transcript_candidates) > 1:
-            result["issues"].append(
-                f"Multiple transcript files ({len(transcript_candidates)}). Using: {result['transcript'].name}"
+            transcript_obj = result["transcript"]
+            name = transcript_obj.name if transcript_obj else "unknown"
+            issues.append(
+                f"Multiple transcript files ({len(transcript_candidates)}). Using: {name}"
             )
     else:
-        result["issues"].append("No transcript/script file found (subtitles disabled)")
+        issues.append("No transcript/script file found (subtitles disabled)")
 
     return result
 
@@ -256,9 +278,11 @@ def read_transcript_text(path: Path) -> Optional[str]:
             except ImportError:
                 log.warning("python-docx not installed, cannot read .docx files")
                 return None
+        return None
     except Exception as e:
         log.error(f"Failed to read transcript {path}: {e}")
         return None
+    return None
 
 
 def _parse_srt_text(path: Path) -> str:
@@ -283,6 +307,53 @@ def _parse_vtt_text(path: Path) -> str:
     cleaned = re.sub(r"<[^>]+>", "", cleaned)
     lines = [l.strip() for l in cleaned.splitlines() if l.strip() and not l.startswith("NOTE")]
     return " ".join(lines)
+
+
+def read_transcript_segments(path: Path) -> tuple[Optional[str], list[dict]]:
+    """
+    Read transcript and return (full_text, segments_with_speakers).
+    Extracts explicit speaker labels like "Speaker 1: text" or "[Speaker A] text".
+    """
+    text = read_transcript_text(path)
+    if not text:
+        return None, []
+
+    # Heuristic parsing for speaker tags:
+    # "Speaker 1: Hello" or "[Host] Welcome"
+    import re
+    segments = []
+
+    # Check if lines have speaker prefixes
+    lines = text.splitlines() if "\n" in text else re.split(r'(?<=[.!?])\s+(?=[A-Z\[])', text)
+    current_speaker = None
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+
+        # Match [Speaker] or Speaker:
+        m = re.match(r'^\[([^\]]+)\]\s*(.*)$', line)
+        if m:
+            current_speaker = m.group(1).strip()
+            content = m.group(2).strip()
+            if content:
+                segments.append({"speaker": current_speaker, "text": content})
+            continue
+
+        m = re.match(r'^([^:]+):\s*(.*)$', line)
+        # Verify it's a short speaker name, not a weird colon usage
+        if m and len(m.group(1)) < 20:
+            current_speaker = m.group(1).strip()
+            content = m.group(2).strip()
+            if content:
+                segments.append({"speaker": current_speaker, "text": content})
+            continue
+
+        segments.append({"speaker": current_speaker, "text": line})
+
+    full_text_clean = " ".join(s["text"] for s in segments)
+    return full_text_clean, segments
 
 
 def scan_for_project_folders(root: Path, recursive: bool = True, max_depth: int = 4) -> list[Path]:
@@ -333,3 +404,4 @@ def copy_file_safe(src: Path, dst: Path) -> bool:
     except Exception as e:
         log.error(f"Failed to copy {src} -> {dst}: {e}")
         return False
+

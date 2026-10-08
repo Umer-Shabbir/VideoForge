@@ -1,4 +1,4 @@
-"""
+﻿"""
 VideoForge Main Window — sidebar layout, fixed-size elements, no crowding.
 """
 
@@ -599,7 +599,7 @@ class MainWindow(QMainWindow):
         self._state.update_project(project)
         if getattr(project, "_queue_after_save", False):
             self._queue_single_project(project.id)
-            project._queue_after_save = False
+            delattr(project, "_queue_after_save")
 
     def _remove_project(self, project_id: str):
         self._state.remove_project(project_id)
@@ -936,7 +936,7 @@ class _FolderImportDialog(QDialog):
         self.setWindowTitle("Add Project Folders")
         self.setMinimumSize(600, 420)
         self._last_folder = last_folder or str(Path.home())
-        self._mode = "direct"   # "direct" | "container"
+        self._mode = "container"   # "direct" | "container"
         self._folders: list[str] = []
         self._build_ui()
 
@@ -963,14 +963,14 @@ class _FolderImportDialog(QDialog):
         mode_lay.setSpacing(8)
 
         self._btn_mode_direct    = QPushButton("📁  Add Project Folder(s)")
-        self._btn_mode_container = QPushButton("🗂  Scan Container Folder")
+        self._btn_mode_container = QPushButton("🗂  Select Master Output Folder")
 
         for btn in (self._btn_mode_direct, self._btn_mode_container):
             btn.setCheckable(True)
             btn.setFixedHeight(32)
             btn.setCursor(Qt.PointingHandCursor)
 
-        self._btn_mode_direct.setChecked(True)
+        self._btn_mode_container.setChecked(True)
         self._btn_mode_direct.clicked.connect(lambda: self._set_mode("direct"))
         self._btn_mode_container.clicked.connect(lambda: self._set_mode("container"))
 
@@ -1140,3 +1140,5 @@ class _FolderImportDialog(QDialog):
             )
             return
         self.accept()
+
+

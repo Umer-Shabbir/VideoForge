@@ -278,7 +278,7 @@ def test_subtitle_file_created():
         result = render_project(project, output_path=out, overwrite=True, save_srt=True)
         assert result.success, f"Render failed: {result.error}"
 
-        srt = out.with_suffix(".srt")
+        srt = out.with_name("audio.srt")
         if srt.exists():
             content = srt.read_text()
             assert "-->" in content
