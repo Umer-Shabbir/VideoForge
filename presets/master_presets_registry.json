@@ -1,0 +1,2373 @@
+{
+  "blueprint": {
+    "preset_name": "blueprint",
+    "display_name": "Blueprint",
+    "description": "Engineering blueprint motion-graphics style · locked 2026-09-23",
+    "voice_name": "Adam   ·  American Male",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based engineering breakdown (5-7 chapters): Chapter 1: The Impossible Challenge (The Anomaly & Constraints) -> Chapter 2: The Core Blueprint (Schematic Breakdown & Hidden Mechanics) -> Chapter 3: The Fatal Stress Point (Catastrophic Risk & Flaw) -> Chapter 4: The Radical Redesign (Iterative Engineering Breakthrough) -> Chapter 5: The Stress Test (Trial by Fire & Triumph) -> Chapter 6: The Living Monument (Legacy & Modern Impact)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "engineering blueprint style, deep blueprint blue background with white ruled construction lines, technical lettering caps, dimension arrows and annotation callouts, patent-drawing aesthetic",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no color fills beyond the two-tone scheme, no photorealism, no glow effects, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Blueprint cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "wipeleft",
+        "wiperight",
+        "dissolve",
+        "rectcrop",
+        "horzopen"
+      ],
+      "video_styling": "Blueprint rhythmic motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Consolas",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.5,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0000E6FF",
+      "subtitle_karaoke_outline": "&H00421C0A",
+      "subtitle_outline_color": "&H003D1B0B",
+      "subtitle_back_color": "&H903D1B0B",
+      "subtitle_outline_width": 2.6,
+      "subtitle_shadow": 1.4,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 38
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Engineering of the Golden Gate Bridge",
+      "How the Panama Canal Lock System Works",
+      "Burj Khalifa: Engineering the World's Tallest Skyscraper",
+      "Saturn V: The Apollo 11 Rocket Engineering",
+      "Chernobyl Reactor 4: The Fatal Design Flaw",
+      "The Construction and Physics of the Hoover Dam",
+      "Gotthard Base Tunnel: Engineering Through the Alps",
+      "James Webb Space Telescope: Origami Mirror Mechanics",
+      "Tacoma Narrows Bridge: Harmonic Resonance Collapse",
+      "Concorde: The Supersonic Passenger Jet Engineering",
+      "Large Hadron Collider: The World's Biggest Machine",
+      "The Trans-Siberian Railway Construction Marvel",
+      "Three Gorges Dam: Hydroelectric Mega-Structure",
+      "The Channel Tunnel: Drilling Beneath the Ocean",
+      "Empire State Building: The 410-Day Speed Build",
+      "Millau Viaduct: Cables Above the Clouds",
+      "Aircraft Carrier Steam Catapults Explained",
+      "Maglev Trains: Magnetic Levitation Engineering",
+      "Seikan Subsea Tunnel: Deepest Rail Tunnel Design",
+      "Akashi Kaikyo Bridge: Earthquake-Proof Engineering"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "hero_schematic",
+        "name": "Exploded Hero Schematic",
+        "description": "Colossal isometric exploded-assembly breakdown of the machine or engineering marvel dominating 50% of the frame with glowing white and cyan technical lines, dimension arrows, and annotation callouts on deep blueprint blue (#002244). Ultra-clean figure-ground separation with zero visual clutter, macro focal clarity, no text."
+      },
+      {
+        "id": "stress_fracture",
+        "name": "Catastrophic Stress Fracture",
+        "description": "High-tension technical cross-section blueprint frozen at the moment of fatal structural failure. Glowing amber and crimson finite-element stress vectors violently rupturing the central load-bearing node against dark technical drafting grid paper, high dramatic stakes, no text."
+      },
+      {
+        "id": "scale_monolith",
+        "name": "Colossal Scale Contrast Drafting",
+        "description": "Extreme worm's-eye architectural perspective of the titanic engineering megastructure towering impossibly over tiny human wireframe silhouettes. Searing cyan laser construction lines pierce deep navy shadow void with intense glowing grid reflections, high dynamic range chiaroscuro, no text."
+      }
+    ],
+    "offline_voice": "Adam   ·  American Male",
+    "elevenlabs_voice": "Jonathan - Professional, Calm, Credible, Clear  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Adam   ·  American Male",
+      "elevenlabs": "Jonathan - Professional, Calm, Credible, Clear  ·  ElevenLabs (Male)"
+    }
+  },
+  "clay": {
+    "preset_name": "clay",
+    "display_name": "Clay",
+    "description": "Pastel clay 3D motion-graphics style · locked 2026-09-23",
+    "voice_name": "Puck   ·  American Male",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based cognitive & behavioral breakdown (5-7 chapters): Chapter 1: The Hidden Loop (The Counterintuitive Glitch & Paradox) -> Chapter 2: The Brain Operating System (Neurological Architecture) -> Chapter 3: The Broken Experiment (Where Everyday Willpower Fails) -> Chapter 4: The Escalating Trap (The Cycle of Cognitive Friction) -> Chapter 5: The Behavioral Pivot (The Counter-Intuitive Reframe) -> Chapter 6: The Rewired Mind (Actionable Philosophy & Transformation)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "friendly matte clay 3D render, pastel seamless studio backdrop, soft global illumination, rounded clay objects with squash-and-stretch physics, maximum 3 hero objects per frame",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no photorealism, no hard speculars, no busy scenes, no more than 3 objects, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Clay cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "smoothleft",
+        "smoothright",
+        "circlecrop",
+        "dissolve",
+        "fade",
+        "radial"
+      ],
+      "video_styling": "Clay rhythmic motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Trebuchet MS",
+      "subtitle_font_size": 54,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.5,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00F2FBFF",
+      "subtitle_karaoke_color": "&H00907BFF",
+      "subtitle_karaoke_outline": "&H0045343A",
+      "subtitle_outline_color": "&H0056434A",
+      "subtitle_back_color": "&H903A3445",
+      "subtitle_outline_width": 3.0,
+      "subtitle_shadow": 2.0,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "bounce",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 36
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Dopamine Loop and Habit Formation",
+      "Why We Procrastinate and How to Stop",
+      "The Pomodoro Technique and Brain Focus",
+      "Cognitive Biases That Influence Daily Choices",
+      "How Sleep Quality Affects Memory Retention",
+      "The Science Behind Imposter Syndrome",
+      "The Paradox of Choice: Why Options Overwhelm Us",
+      "Building Atomic Habits Through Micro-Changes",
+      "How Mindfulness Meditative Practice Rewires the Brain",
+      "The Power of Introversion in an Extroverted World",
+      "Why Multitasking Is a Mythical Illusion",
+      "The Psychology of First Impressions",
+      "Understanding Emotional Intelligence in Relationships",
+      "The Flow State: Achieving Peak Creative Focus",
+      "How Music Alters Brain Chemistry and Mood",
+      "Overcoming Social Anxiety and Public Speaking Fear",
+      "The Psychological Benefits of Daily Gratitude",
+      "Why We Forget Names Immediately After Introductions",
+      "The Social Proof Effect and Herd Mentality",
+      "How Physical Exercise Boosts Cognitive Power"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "tactile_hero_dilemma",
+        "name": "Tactile Hero Dilemma",
+        "description": "Oversized sculpted matte clay character bust or hero focal object bulging dynamically toward the camera (45% canvas coverage), visible human thumbprint textures, wide expressive anxious clay eyes, soft 3-point studio key lighting against a seamless pastel studio backdrop. Maximum focal clarity, no text."
+      },
+      {
+        "id": "cognitive_trap_diorama",
+        "name": "Cognitive Trap Diorama",
+        "description": "Curious 3D clay diorama frozen at the tipping point of catastrophe: a clay figure caught on an impossible paradoxical staircase or precariously balancing on a tipping giant clay hourglass, squash-and-stretch clay physics capturing the instant before collapse. High narrative tension, no text."
+      },
+      {
+        "id": "split_mind_confrontation",
+        "name": "Split-Mind Confrontation",
+        "description": "Dramatic split-field clay confrontation: rational calm mind in soft sage-green clay facing off against an impulsive emotional monster in saturated terracotta clay, dramatic soft rim lighting and shallow tilt-shift depth of field, high contrast pastel pop, no text."
+      }
+    ],
+    "offline_voice": "Puck   ·  American Male",
+    "elevenlabs_voice": "Charlie  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Puck   ·  American Male",
+      "elevenlabs": "Charlie  ·  ElevenLabs (Male)"
+    }
+  },
+  "cobalt_impact": {
+    "preset_name": "cobalt_impact",
+    "display_name": "Cobalt Impact",
+    "description": "Cobalt Impact motion graphics style pack.",
+    "voice_name": "Lewis  ·  British Male",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based high-stakes investigative breakdown (5-7 chapters): Chapter 1: The Silent Monopoly (The Shocking Chokepoint Hook) -> Chapter 2: The Inner Circle (Ambition, Power & Secret Deals) -> Chapter 3: The Tightening Grip (Escalating Market & Political Dominance) -> Chapter 4: The Flashpoint (The Threat That Shook the System) -> Chapter 5: The Showdown (High-Stakes Clash & Reckoning) -> Chapter 6: The Unseen Horizon (The Future Stakes & Global Impact)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "bold flat vector illustration, cobalt blue and black fields, spray grain texture, faceless figures mid-action, hard diagonal compositions, no gradients, high contrast cobalt and white",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no photorealism, no facial features, no soft shadows, no thin delicate linework, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Cobalt Impact cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "wipeleft",
+        "wiperight",
+        "slideleft",
+        "slideright",
+        "fade",
+        "dissolve"
+      ],
+      "video_styling": "Cobalt Impact cinematic motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Impact",
+      "subtitle_font_size": 62,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.0,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0000A2FF",
+      "subtitle_karaoke_outline": "&H00000000",
+      "subtitle_outline_color": "&H000C0808",
+      "subtitle_back_color": "&HA00C0808",
+      "subtitle_outline_width": 3.4,
+      "subtitle_shadow": 2.2,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 70,
+      "subtitle_max_chars": 34
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Global Semiconductor Microchip Supply Chain Crisis",
+      "Suez Canal Blockade: Global Economic Impact",
+      "The Battle for Global Rare Earth Mineral Monopoly",
+      "The 1973 Oil Embargo Economic Shock",
+      "Cyber Warfare: The New Global Battlefield",
+      "Strategic Global Maritime Shipping Chokepoints",
+      "Taiwan Strait Semiconductor Geopolitics",
+      "The Lithium Triangle Mineral Race",
+      "Artificial Intelligence National Defense Arms Race",
+      "How Economic Sanctions Impact Global Markets",
+      "Deep Sea Mining Territorial Disputes",
+      "GPS Navigation System Vulnerabilities",
+      "Undersea Fiber Optic Cable Security Threats",
+      "Challenges to US Dollar Global Dominance",
+      "Global Food Supply Chain Fragility",
+      "Drone Technology and Modern Warfare Shift",
+      "Space Satellite Defense Infrastructure Frontier",
+      "Geopolitics of Water Scarcity and Rivers",
+      "Critical National Infrastructure Cyber Protection",
+      "The New Arctic Trade Route Territorial Rivalry"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "shadow_hegemon",
+        "name": "Shadow Hegemon",
+        "description": "Monolithic razor-sharp faceless human silhouette dominating 50% of the frame in jet black, set against an explosive radial field of intense cobalt blue (#0020C2) and stark optic white, heavy spray-grain halftone texture, aggressive diagonal power lines, extreme visual punch, no text."
+      },
+      {
+        "id": "chokepoint_stranglehold",
+        "name": "Chokepoint Stranglehold",
+        "description": "High-tension geopolitical chokepoint map (strait, canal, or border corridor) pinched between two massive opposing vector arrow forces, glowing crimson hazard pings and fractured cobalt trade routes at the brink of siege. High curiosity, no text."
+      },
+      {
+        "id": "bipolar_titan_clash",
+        "name": "Bipolar Titan Clash",
+        "description": "Diagonal split-screen vector clash: two colossal ideological or military titan emblems hurtling toward each other on a collision course, stark optic white and deep cobalt vector fields colliding with explosive spray-grain particle friction. Visually arresting, no text."
+      }
+    ],
+    "offline_voice": "Lewis  ·  British Male",
+    "elevenlabs_voice": "Sam    ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Lewis  ·  British Male",
+      "elevenlabs": "Sam    ·  ElevenLabs (Male)"
+    }
+  },
+  "cutout_collage": {
+    "preset_name": "cutout_collage",
+    "display_name": "Cutout Collage",
+    "description": "Documentary cutout collage / halftone archival aesthetic",
+    "voice_name": "George ·  British Male",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based cultural collage narrative (5-7 chapters): Chapter 1: The Spark in the Dark (The Countercultural Flashpoint) -> Chapter 2: The Monopolized Culture (The Rigid Gatekeepers Before) -> Chapter 3: The Guerrilla Medium (Scavenging Tools & Raw Expression) -> Chapter 4: The Subculture Surge (Underground Phenomenon Explodes) -> Chapter 5: The Establishment Backlash (Moral Panic & Censorship) -> Chapter 6: The Enduring DNA (How It Permanently Altered Modern Culture)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "documentary cutout collage style, halftone black and white cutout figures with red offset marker strokes, aged paper background stage, bold condensed headline typography, desaturated archival aesthetic",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no glossy 3D, no lens flares, no full-color midground portraits, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Cutout Collage cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "wipeup",
+        "wipedown",
+        "dissolve",
+        "circleclose"
+      ],
+      "video_styling": "Cutout Collage paper motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Courier New",
+      "subtitle_font_size": 50,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.8,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00EBEFF5",
+      "subtitle_karaoke_color": "&H002828E6",
+      "subtitle_karaoke_outline": "&H00141212",
+      "subtitle_outline_color": "&H001A1818",
+      "subtitle_back_color": "&HA0141212",
+      "subtitle_outline_width": 2.6,
+      "subtitle_shadow": 1.8,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "box",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 38
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Mystery of the Undeciphered Voynich Manuscript",
+      "The Disappearance of the Roanoke Colony",
+      "World War II Ghost Army Inflatable Decoys",
+      "Enigma Codebreakers of Bletchley Park",
+      "The Mysterious Disappearance of Amelia Earhart",
+      "The Lost Amber Room Russian Treasure",
+      "Operation Mincemeat WWII Deception Plan",
+      "The Identity Mystery of the Man in the Iron Mask",
+      "The Dancing Plague of 1518",
+      "The Antikythera Mechanism Ancient Computer",
+      "The DB Cooper Unsolved Plane Hijacking",
+      "The Mary Celeste Abandoned Ghost Ship",
+      "Deciphering the Ancient Rosetta Stone",
+      "The Great Stink of London 1858",
+      "The Culper Ring Secret Revolutionary Spies",
+      "The Tunguska Siberian Explosion Mystery",
+      "The Destruction of the Library of Alexandria",
+      "The Oak Island Money Pit Treasure Hunt",
+      "The Mysterious Battle of Los Angeles 1942",
+      "The Unsolved Monster of Florence Case"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "redacted_powerbroker",
+        "name": "Redacted Power Broker",
+        "description": "High-contrast black-and-white halftone cutout portrait of the central power broker dominating 45% of the frame, pierced by bold hand-drawn red marker redactions across the eyes, textured vintage newsprint with dramatic low-key edge lighting. Raw investigative intensity, no text."
+      },
+      {
+        "id": "smoking_gun_dossier",
+        "name": "Smoking Gun Classified Dossier",
+        "description": "Macro forensic flat-lay: a torn manila top-secret dossier held together with yellowed masking tape, spilling an incriminating vintage photograph pinned with blood-red thread connecting to a shadowy cutout puppet master. High mystery, no text."
+      },
+      {
+        "id": "torn_facade_subversion",
+        "name": "Torn Facade Subversion",
+        "description": "Violently ripped paper edge bisecting the image: a clean vintage public-facing corporate portrait torn open down the center to reveal the gritty, dark-room underground archival truth beneath the paper fiber. High contrast aged newsprint and red marker accents, no text."
+      }
+    ],
+    "offline_voice": "George ·  British Male",
+    "elevenlabs_voice": "George - Warm, Captivating Storyteller  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "George ·  British Male",
+      "elevenlabs": "George - Warm, Captivating Storyteller  ·  ElevenLabs (Male)"
+    }
+  },
+  "glass_node": {
+    "preset_name": "glass_node",
+    "display_name": "Glass Node",
+    "description": "Dark glass UI panels · node graphs · neon data void",
+    "voice_name": "Echo   ·  American Male",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based technological & network systems breakdown (5-7 chapters): Chapter 1: The Digital Ghost (The System Anomaly / Impossible Signal) -> Chapter 2: Inside the Machine (Network Architecture & Algorithmic Plumbing) -> Chapter 3: The Unintended Loop (The Hidden Glitch in the Matrix) -> Chapter 4: The Cascade (System Failure Under Load) -> Chapter 5: The Breakthrough Protocol (The Computational Leap) -> Chapter 6: The New Reality (Philosophical Horizon of Autonomous Systems)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "dark glass UI panels floating in near-black void, translucent glass with 1px light borders, violet and cyan neon rim light, node graphs with glowing wires, clean monospace typography for data",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no daylight scenes, no paper textures, no cartoon characters, no overexposed bloom, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Glass Node cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "dissolve",
+        "radial",
+        "fade",
+        "circleopen",
+        "smoothright"
+      ],
+      "video_styling": "Glass Node tech motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Segoe UI",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.2,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00FFF5F0",
+      "subtitle_karaoke_color": "&H00FFF000",
+      "subtitle_karaoke_outline": "&H00420A24",
+      "subtitle_outline_color": "&H00140908",
+      "subtitle_back_color": "&H80140908",
+      "subtitle_outline_width": 2.6,
+      "subtitle_shadow": 1.5,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "glow",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 38
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "How Transformer Neural Networks Process Language",
+      "Quantum Computing Qubits and Superposition Explained",
+      "Self-Driving Autonomous Vehicle Perception Architecture",
+      "Zero-Knowledge Proofs in Modern Cryptography",
+      "Large Language Model Attention Mechanisms",
+      "The Stuxnet Cyber Weapon Architecture",
+      "Neuralink Brain-Computer Interface Technology",
+      "Nuclear Fusion Tokamak Reactor Physics",
+      "CRISPR Cas9 Gene Editing Molecular Mechanism",
+      "6G Wireless Mesh Network Infrastructure",
+      "Silicon Photonics Optical Chip Communication",
+      "Artificial General Intelligence Safety Guardrails",
+      "Satellite Mesh Internet Constellations",
+      "Decentralized Identity Protocol Encryption",
+      "Autonomous Drone Swarm Coordination Algorithms",
+      "Edge AI Microchip Hardware Acceleration",
+      "Solid-State Battery Chemistry Breakthroughs",
+      "Quantum Key Distribution Encryption Security",
+      "Deepfake Video Detection Algorithmic Neural Nets",
+      "Spatial Computing Holographic Display Engines"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "luminous_core_node",
+        "name": "Luminous Core Node",
+        "description": "Colossal multi-faceted frosted glass cube or data core floating in an obsidian void, glowing electric cyan and magenta circuitry refracting through internal crystalline bevels, razor-sharp 1px luminous edge borders, commanding 50% canvas presence, no text."
+      },
+      {
+        "id": "system_cascade_breach",
+        "name": "System Cascade Breach",
+        "description": "Intricate floating network grid of dark glass interface cards where a single glowing crimson corrupted node is spider-web shattering the dark glass pane, volumetric neon bloom and electric spark arcs spreading through the network. High stakes, no text."
+      },
+      {
+        "id": "dual_spectrum_prism",
+        "name": "Dual-Spectrum Prism",
+        "description": "Dark optical glass prism splitting an incoming beam of cold white data into searing neon ultraviolet and amber telemetry lines, reflecting high-frequency hexadecimal code against deep mirror-black reflections. Searing feed pop, no text."
+      }
+    ],
+    "offline_voice": "Echo   ·  American Male",
+    "elevenlabs_voice": "Antoni ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Echo   ·  American Male",
+      "elevenlabs": "Antoni ·  ElevenLabs (Male)"
+    }
+  },
+  "line_graphic": {
+    "preset_name": "line_graphic",
+    "display_name": "Line Graphic",
+    "description": "Friendly flat line illustration system: gray line architecture, dotted paths,",
+    "voice_name": "Sarah  ·  American Female",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based scientific & physical mechanics breakdown (5-7 chapters): Chapter 1: The Observable Paradox (The Physical Impossibility Hook) -> Chapter 2: The Governing Laws (Fundamental Forces & Physical Constraints) -> Chapter 3: The Battle of Forces (Equilibrium vs Entropy in Action) -> Chapter 4: The Point of Failure (Where Math Collides with Harsh Reality) -> Chapter 5: The Elegant Solution (Quantitative & Scientific Breakthrough) -> Chapter 6: The Universal Law (Implications Beyond the Problem)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "friendly flat line illustration, white background, gray line architecture, exactly two accent colors mustard and magenta, clean geometric iconography, flat vector shapes, dotted paths between elements, no gradients",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no gradients, no 3D, no photo textures, no detailed faces, no more than two accent colors, no music, no voice-over, no narration, no photorealism, no 35mm, no photography, no realistic skin, no text, no letters, no typography",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Line Graphic cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "wipeleft",
+        "wiperight",
+        "wipeup",
+        "wipedown",
+        "fade",
+        "dissolve"
+      ],
+      "video_styling": "Line Graphic modern motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Bahnschrift",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.2,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0003B7FF",
+      "subtitle_karaoke_outline": "&H0028221F",
+      "subtitle_outline_color": "&H00362E2B",
+      "subtitle_back_color": "&H9028221F",
+      "subtitle_outline_width": 2.8,
+      "subtitle_shadow": 1.4,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 38
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Lean Startup Minimum Viable Product Playbook",
+      "Designing User Interfaces for High Retention Hooks",
+      "SaaS Tiered Pricing Model Strategies",
+      "Product-Led Growth Product Mechanics",
+      "Psychology of User Onboarding Micro-Interactions",
+      "Building Scalable Cloud Microservices Architecture",
+      "Dark Patterns in UI UX Digital Design",
+      "Calculating Viral K-Factor Growth Coefficients",
+      "Customer Lifetime Value vs Acquisition Cost Metrics",
+      "Balancing Freemium vs Paid Software Features",
+      "Design Systems Scale Across Large Engineering Teams",
+      "Agile vs Kanban Software Development Workflows",
+      "Data-Driven Conversion Rate Optimization Principles",
+      "Continuous Integration and CI CD Pipeline Automation",
+      "A B Testing Statistics for Product Managers",
+      "The Network Effect Growth Engine Dynamics",
+      "User Journey Mapping and Target Persona Profiles",
+      "SaaS Churn Rate Reduction and Retention Tactics",
+      "Mobile First Responsive Layout Design Rules",
+      "API-First Software Development Architecture"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "geometric_monolith",
+        "name": "Geometric Monolith",
+        "description": "Ultra-clean, bold black line-art architectural icon or machine commanding 45% of a pure white canvas, electrified by a single high-saturation mustard-yellow or magenta focal accent, zero background clutter, maximum 300ms glanceability, no text."
+      },
+      {
+        "id": "tipping_domino_cascade",
+        "name": "Tipping Domino Cascade",
+        "description": "Kinetic line-diagram capturing a fatal domino-effect chain reaction: a tiny single line-art decision trigger causing massive geometric institutional blocks to topple in mid-air, dynamic motion-line vectors on pure white space. High narrative curiosity, no text."
+      },
+      {
+        "id": "david_vs_machine",
+        "name": "David vs The Corporate Machine",
+        "description": "Stark scale juxtaposition: a solitary, minimalist line-art human silhouette standing before an impossibly towering geometric labyrinth of gears and conduits, crisp black line architecture starkly contrasting pure white negative space with a searing magenta focal highlight. No text."
+      }
+    ],
+    "offline_voice": "Sarah  ·  American Female",
+    "elevenlabs_voice": "Johnny - authentic and expressive  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Sarah  ·  American Female",
+      "elevenlabs": "Johnny - authentic and expressive  ·  ElevenLabs (Male)"
+    }
+  },
+  "paint_blast": {
+    "preset_name": "paint_blast",
+    "display_name": "Paint Blast",
+    "description": "Paint Blast motion graphics style pack.",
+    "voice_name": "Sky    ·  American Female",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based explosive historical & artistic movement arc (5-7 chapters): Chapter 1: The Powder Keg (The Ticking Tension Before the Blast) -> Chapter 2: The Provocateurs (The Rebels Who Defied the Status Quo) -> Chapter 3: The Detonation (The Moment Everything Changed Forever) -> Chapter 4: The Shockwave (Chaos, Resistance & Escalating Stakes) -> Chapter 5: The Climax (The Decisive Confrontation) -> Chapter 6: The New World Order (Lingering Cultural & Historical Echoes)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "paint over photo style, real photograph base with aggressive hand-painted brush stroke bursts on top, electric yellow and green paint strokes, white keylines around hero subject, energetic editorial feel",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no digital glow effects, no lens flares, no 3D text, no clean geometric shapes, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Paint Blast cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "radial",
+        "circlecrop",
+        "dissolve",
+        "fade",
+        "smoothleft"
+      ],
+      "video_styling": "Paint Blast dynamic motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Impact",
+      "subtitle_font_size": 60,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.5,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0000FFF4",
+      "subtitle_karaoke_outline": "&H00000000",
+      "subtitle_outline_color": "&H00141010",
+      "subtitle_back_color": "&HA0141010",
+      "subtitle_outline_width": 3.5,
+      "subtitle_shadow": 2.4,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "bounce",
+      "subtitle_margin_v": 70,
+      "subtitle_max_chars": 34
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Birth of Hip-Hop Culture in 1970s Bronx",
+      "The Skateboarding Boom of the 1990s",
+      "Street Art: From Illegal Graffiti to Banksy Auctions",
+      "The 1970s Punk Rock Counterculture Revolution",
+      "How Air Jordans Transformed Global Sneaker Culture",
+      "The Visual Evolution of Video Game Aesthetics",
+      "The 1990s Grunge Music Movement in Seattle",
+      "The History and Culture of Electronic Dance Festivals",
+      "Pop Art Revolution: Andy Warhol to Jean-Michel Basquiat",
+      "The Culture and Evolution of Internet Memes",
+      "The Global Rise of Anime and Manga Culture",
+      "The Golden Age of 1980s Video Game Arcades",
+      "Heavy Metal Subculture and Visual Branding History",
+      "The Origins and Evolution of Breakdancing",
+      "Extreme Sports X-Games Cultural Impact",
+      "The Cyberpunk Sci-Fi Cultural Aesthetic",
+      "Indie Rock Culture of the 2000s Era",
+      "The Streetwear Fashion Revolution",
+      "The Visual History of Comic Book Heroes",
+      "The Vinyl Record Resurgence in Digital Era"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "visceral_paint_rupture",
+        "name": "Visceral Paint Rupture",
+        "description": "Desaturated, authentic historical photographic portrait of the protagonist violently interrupted by a thick, high-viscosity explosion of neon acrylic cyan and cadmium yellow paint splashed across the focal subject, heavy textured dripping brushwork, 45% canvas dominance, no text."
+      },
+      {
+        "id": "slashed_reality_canvas",
+        "name": "Slashed Reality Canvas",
+        "description": "Classical historical scene or institutional portrait aggressively slashed diagonally by a heavy impasto palette-knife oil stroke, peeling back the canvas to reveal a contrasting explosive street-art reality underneath. Deep dramatic tension, no text."
+      },
+      {
+        "id": "kinetic_pigment_detonation",
+        "name": "Kinetic Pigment Detonation",
+        "description": "Hero subject caught in an explosive outward shockwave of aerosol neon paint splatters and kinetic dry-brush streaks, hyper-vivid saturated pigments popping off a muted monochromatic photographic foundation. Maximum visual energy, no text."
+      }
+    ],
+    "offline_voice": "Sky    ·  American Female",
+    "elevenlabs_voice": "Laura - Enthusiast, Quirky Attitude  ·  ElevenLabs (Female)",
+    "voices": {
+      "offline": "Sky    ·  American Female",
+      "elevenlabs": "Laura - Enthusiast, Quirky Attitude  ·  ElevenLabs (Female)"
+    }
+  },
+  "paper_glass": {
+    "preset_name": "paper_glass",
+    "display_name": "Paper Glass",
+    "description": "PAPER & GLASS",
+    "voice_name": "Emma   ·  British Female",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based philosophical exploration (5-7 chapters): Chapter 1: The Existential Trap (The Modern Illusion & Universal Crisis) -> Chapter 2: The Ancient Lens (The Forgotten Insight from History) -> Chapter 3: The Fire of Experience (The Crucible of Suffering & Struggle) -> Chapter 4: Stripping Away the False (Confronting the Uncomfortable Truth) -> Chapter 5: The Inner Citadel (The Philosophical Paradigm Shift) -> Chapter 6: The Art of Living (Practical Wisdom for the Modern World)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "premium editorial design, warm cream paper texture, dark glass image cards, clean grid composition, bold visual hierarchy, electric blue and violet accents, clean grid layout, soft paper shadows",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no childish cartoon mascots, no cyberpunk city clutter, no plastic 3D people, no music, no voice-over, no narration, no text, no letters, no typography, no captions, no labels, no watermark, no on-screen text, no words",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Paper Glass cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "dissolve",
+        "vertopen",
+        "horzopen",
+        "smoothup"
+      ],
+      "video_styling": "Paper Glass editorial motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Franklin Gothic Medium",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.8,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00F5F8FA",
+      "subtitle_karaoke_color": "&H0042B8E5",
+      "subtitle_karaoke_outline": "&H00191311",
+      "subtitle_outline_color": "&H00261D1A",
+      "subtitle_back_color": "&H85261D1A",
+      "subtitle_outline_width": 2.5,
+      "subtitle_shadow": 1.6,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "glow",
+      "subtitle_margin_v": 85,
+      "subtitle_max_chars": 36
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Philosophy of Stoicism for Modern Living",
+      "Brutalist Architecture: Raw Concrete Aesthetics",
+      "The Craft of Storytelling in Classic Literature",
+      "Minimalism: Philosophy, Aesthetics, and Lifestyle",
+      "The History and Anatomy of Typography",
+      "Existentialism: Camus, Sartre, and Finding Meaning",
+      "Bauhaus School: Form Follows Function Philosophy",
+      "The Psychology of Color in Fine Art and Cinema",
+      "Classical Symphony Structure and Musical Form",
+      "The Renaissance Perspective Revolution in Painting",
+      "Japanese Wabi-Sabi Aesthetic Philosophy",
+      "The Narrative Power of Silence in Cinema",
+      "Architectural Evolution of Modern Skyscrapers",
+      "The Classical Art of Rhetoric and Persuasion",
+      "Impressionism: Capturing Fleeting Light on Canvas",
+      "The Philosophy of Time, Memory, and Consciousness",
+      "Mid-Century Modern Furniture and Interior Design",
+      "The History and Design of Great Libraries",
+      "Surrealism: Unlocking the Subconscious Mind",
+      "The Evolution of the Literary Essay Form"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "floating_smoked_plaque",
+        "name": "Floating Smoked-Glass Plaque",
+        "description": "Heavy warm-cream tactile cotton paper background (#F4F1EA) overlaid by a sleek, floating dark smoked-glass card showcasing the hero subject, soft editorial drop shadows, ultra-clean Swiss layout lines, commanding 45% canvas presence, no text."
+      },
+      {
+        "id": "forensic_ledger_breach",
+        "name": "Forensic Ledger Breach",
+        "description": "Macro editorial flat-lay: tactile manila folders and frosted translucent glass overlay cards, with a heavy brass-and-glass magnifying lens focusing on a single highlighted red deficit ledger entry, gold-foil forensic stamps. High curiosity, no text."
+      },
+      {
+        "id": "luxury_paper_rupture",
+        "name": "Luxury Paper Rupture",
+        "description": "Deep torn-edge deckle paper rupture revealing an ominous obsidian-glass technical schematic glowing with electric blue and gold telemetry lines beneath the surface, soft ambient studio lighting, sophisticated chiaroscuro contrast, no text."
+      }
+    ],
+    "offline_voice": "Emma   ·  British Female",
+    "elevenlabs_voice": "Sarah - Mature, Reassuring, Confident  ·  ElevenLabs (Female)",
+    "voices": {
+      "offline": "Emma   ·  British Female",
+      "elevenlabs": "Sarah - Mature, Reassuring, Confident  ·  ElevenLabs (Female)"
+    }
+  },
+  "phosphor_terminal": {
+    "preset_name": "phosphor_terminal",
+    "display_name": "Phosphor Terminal",
+    "description": "Motion graphics director brief: CRT terminal aesthetic, style locked once.",
+    "voice_name": "Daniel ·  British Male",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based cybersecurity & intelligence deep dive (5-7 chapters): Chapter 1: The Ghost in the Terminal (Zero-Day Intrusion & Alarm) -> Chapter 2: The Cipher Mechanism (Mathematical Architecture of Secrecy) -> Chapter 3: The Digital Hunt (Adversaries, Exploits & Quiet Infiltration) -> Chapter 4: The Ticking Countdown (The Crisis Threatening Critical Infrastructure) -> Chapter 5: The Exploit Exposed (The Codebreaking Breakthrough) -> Chapter 6: The Silent Battlefield (The Lingering Digital Cold War)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "phosphor green terminal CRT aesthetic, scanlines visible, authentic terminal scanline phosphors, CRT curvature, dark near-black background, empty screen except the described elements",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no modern UI elements, no smooth vector graphics, no full color photos, no gradients, no 3D elements, no music, no voice-over, no narration, no illegible text dumps, no random typography, no blur",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Phosphor Terminal cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "wipeleft",
+        "wiperight",
+        "horzopen",
+        "fade",
+        "dissolve"
+      ],
+      "video_styling": "Phosphor Terminal CRT motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Lucida Console",
+      "subtitle_font_size": 50,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.5,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H0066FF33",
+      "subtitle_karaoke_color": "&H00E8FFE0",
+      "subtitle_karaoke_outline": "&H00040C03",
+      "subtitle_outline_color": "&H00081A05",
+      "subtitle_back_color": "&HA0040C03",
+      "subtitle_outline_width": 2.6,
+      "subtitle_shadow": 1.8,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "glow",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 36
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Y2K Bug Code Remediation Effort",
+      "The Origins of UNIX Operating System and C",
+      "The 1988 Morris Worm: The First Internet Virus",
+      "How Cryptographers Cracked DVD CSS Protection",
+      "From ARPANET to the Modern World Wide Web",
+      "The Therac-25 Medical Accelerator Software Bug",
+      "The History and Architecture of Linux Kernel",
+      "Cap'n Crunch John Draper and Phone Phreaking",
+      "The 1983 414s Hacker Group Investigation",
+      "The History of Bulletin Board Systems BBS",
+      "The Apollo 11 Guidance Computer Code",
+      "How the 1999 Melissa Virus Automated Mail Spreading",
+      "The Kevin Mitnick Cyber Case History",
+      "The Fast Inverse Square Root Algorithm in Quake",
+      "The Origins of Open Source Software Movement",
+      "Stuxnet Malware Code Engineering Analysis",
+      "The History and Engineering of Game Emulation",
+      "The Bitcoin Genesis Block Ciphertext",
+      "The History of Internet Relay Chat IRC",
+      "How the Enigma Rotor Machine Cipher Was Broken"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "fatal_panic_dump",
+        "name": "Fatal Panic Dump",
+        "description": "Curved, bulbous green CRT monitor screen dominating 55% of the frame in macro Dutch-angle, intense emerald and amber fatal memory dump logs blooming across visible scanlines, reflection of a tense dark server room, extreme mobile glanceability, no text."
+      },
+      {
+        "id": "intercepted_vector_radar",
+        "name": "Intercepted Vector Radar",
+        "description": "Tactical CRT radar display tracking an anomalous, unidentified vector breaching classified airspace, blinking crimson hazard rings spreading across an emerald vector grid, authentic 1980s computer terminal chassis. High urgency, no text."
+      },
+      {
+        "id": "hardware_scanline_meltdown",
+        "name": "Hardware Scanline Meltdown",
+        "description": "CRT terminal violently glitching with horizontal scanline displacement and phosphor bloom, searing neon amber crash logs contrasting toxic green phosphor trails against pitch-black monitor glass, volumetric screen glow, no text."
+      }
+    ],
+    "offline_voice": "Daniel ·  British Male",
+    "elevenlabs_voice": "Roger - Laid-Back, Casual, Resonant  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Daniel ·  British Male",
+      "elevenlabs": "Roger - Laid-Back, Casual, Resonant  ·  ElevenLabs (Male)"
+    }
+  },
+  "punk_zine": {
+    "preset_name": "punk_zine",
+    "display_name": "Punk Zine",
+    "description": "DIY punk zine collage / xerox photocopy aesthetic",
+    "voice_name": "Kore   ·  American Female",
+    "content_automation": {
+      "title_structure": "Intriguing and high-impact title",
+      "hook_style": "High curiosity and strong narrative tension",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, dramatic, engaging",
+      "pacing": "Punchy, rhythmic, 160-180 wpm",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based DIY resistance & counterculture narrative (5-7 chapters): Chapter 1: The Midnight Break-In (Stolen Ink & Guerrilla Printing Hook) -> Chapter 2: The Monopolized Signal (Gatekeepers & Cultural Silence) -> Chapter 3: The Xerox Weapon (Hacking Industrial Office Copiers) -> Chapter 4: The Postal Highway (Decentralized SASE Network Explodes) -> Chapter 5: The Moral Panic (FBI Files, Police Raids & Censorship) -> Chapter 6: The Paper Indictment (Why the Analog Rebellion Still Matters)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "punk zine collage style, cream stock with saturated cobalt ink fields, masking tape strips, photo cutouts with rough white keylines, ransom note mixed lettering, print grain texture, tomato red accents",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "no clean vector minimalism, no soft gradients, no glossy UI, no perfect alignment, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Lock character style strictly to the preset aesthetics.",
+      "environment_consistency": "Strict adherence to the predefined color palette and visual elements.",
+      "cinematic_style": "Punk Zine cinematic motion graphics"
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "pixelize",
+        "wipeleft",
+        "slideleft",
+        "fade",
+        "dissolve"
+      ],
+      "video_styling": "Punk Zine photocopy motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Impact",
+      "subtitle_font_size": 64,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.5,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H0000F0FF",
+      "subtitle_karaoke_color": "&H002A2AFF",
+      "subtitle_karaoke_outline": "&H00000000",
+      "subtitle_outline_color": "&H00000000",
+      "subtitle_back_color": "&HC0000000",
+      "subtitle_outline_width": 3.8,
+      "subtitle_shadow": 2.8,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 70,
+      "subtitle_max_chars": 32
+    },
+    "video_language": "English",
+    "niche_topics": [
+      "The Underground DIY Zine Explosion of the 1980s",
+      "Pirate Radio Stations of the 1960s British Coast",
+      "The 2000s Garage Rock Revival Movement",
+      "Midnight Movies and Cult Cinema History",
+      "The Underground Comix Movement of R. Crumb",
+      "The DIY Cassette Tape Exchange Subculture",
+      "The History of Riot Grrrl Feminist Fanzines",
+      "Anarcho-Punk Cover Art and Flyer Aesthetics",
+      "The Underground VHS Skate Video Culture",
+      "Underground Hip-Hop Mixtape Distro Networks",
+      "The 1990s Independent Film Sundance Revolution",
+      "The History of Speakeasies and Underground Venues",
+      "Lowbrow Hot Rod Art and Kustom Kulture",
+      "The Guerrilla Street Theater Movement",
+      "Underground Warehouse Rave Culture of the 90s",
+      "Self-Published Underground Political Pamphlets",
+      "DIY Screenprinting and Gig Poster Design",
+      "The Counterculture Underground Press of the 60s",
+      "Industrial Music Pioneers and Noise Art",
+      "Subversive Satire Zines and Underground Humor"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "crushed_xerox_icon",
+        "name": "Crushed Xerox Icon",
+        "description": "Ultra-high-contrast crushed-black xerox photocopy portrait on rough halftone newsprint, saturated spot-color neon pink or sulfur yellow ink bleed across the eyes, raw torn-paper edges on dark distressed asphalt, 50% canvas dominance, no text."
+      },
+      {
+        "id": "ransom_conspiracy_collage",
+        "name": "Ransom Conspiracy Collage",
+        "description": "Chaotic DIY evidence collage: jagged torn black-and-white crime scene cutouts slapped with textured duct tape, hand-cut mixed ransom lettering, and aggressive red spray-paint stencil arrows pointing to a smoking gun. High mystery, no text."
+      },
+      {
+        "id": "peeling_wheatpaste_confrontation",
+        "name": "Peeling Wheatpaste Confrontation",
+        "description": "Gritty urban wheatpaste poster peeling violently off a damp night brick wall, ripped layers revealing a shocking underground dissident graphic, high-contrast ink splatter and raw distressed print grain. Visual confrontation, no text."
+      }
+    ],
+    "offline_voice": "Kore   ·  American Female",
+    "elevenlabs_voice": "Steve  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Kore   ·  American Female",
+      "elevenlabs": "Steve  ·  ElevenLabs (Male)"
+    }
+  },
+  "money_chuck": {
+    "preset_name": "money_chuck",
+    "display_name": "Money Chuck",
+    "description": "White-background stick-figure doodle explainers about worst business decisions.",
+    "voice_name": "Michael·  American Male",
+    "content_automation": {
+      "title_structure": "Top 10 Times ONE [singular trigger] [DESTROYED/KILLED/SAVED] a [beloved entity]",
+      "hook_style": "Singular-agent schadenfreude: ONE decision, ONE ad, ONE mistake, ONE CEO.",
+      "target_words": 2200,
+      "target_duration_minutes": 10,
+      "tone": "Deadpan, wry, third-person storyteller. Dry humor, never slapstick.",
+      "pacing": "Short punchy sentences. ~170-190 words per minute.",
+      "scene_density": "1 visual prompt per 2-3 narration sentences.",
+      "narrative_structure": "Chapter-based corporate disaster & fraud breakdown (5-7 chapters): Chapter 1: The 40 Billion Illusion (The Absurd Valuation Hook) -> Chapter 2: The Charismatic Charlatan (The Pitch, The Ego & The Cult) -> Chapter 3: The Boardroom Cowards (Enablers, Red Flags & Complicity) -> Chapter 4: The Cash Inferno (Burning Through Billions in Broad Daylight) -> Chapter 5: The 48-Hour Freefall (The Unraveling, The Run & The Collapse) -> Chapter 6: The Golden Parachute (The Aftermath, The Victims & The Punchline)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "Minimalist black stick-figure doodle animation on a PURE WHITE background (#FFFFFF).",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "photorealistic, 3d, shading, color gradients, textures",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Locked stick-figure design: circle head, thick rounded limbs.",
+      "environment_consistency": "Background is ALWAYS pure white (#FFFFFF).",
+      "cinematic_style": "Flat 2D doodle style with text cards and simple caricatures."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "dissolve",
+        "circlecrop"
+      ],
+      "video_styling": "fast-paced cuts, pop-up text annotations",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Impact",
+      "subtitle_font_size": 60,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.0,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0076E600",
+      "subtitle_karaoke_outline": "&H00000000",
+      "subtitle_outline_color": "&H00080808",
+      "subtitle_back_color": "&HA0080808",
+      "subtitle_outline_width": 3.2,
+      "subtitle_shadow": 2.2,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 70,
+      "subtitle_max_chars": 34
+    },
+    "thumbnail_styles": [
+      {
+        "id": "smug_billionaire_caricature",
+        "name": "The Smug Billionaire Caricature",
+        "description": "Pure white background (#FFFFFF) featuring a dominant, oversized stick-figure CEO caricature with dollar-sign eyes smugly clutching a comically massive bag of burning money, thick black marker linework, one bright red marker 'FAIL' stamp, 50% screen dominance, hilarious and punchy, no text."
+      },
+      {
+        "id": "cliff_collapse_40b",
+        "name": "The $40 Billion Cliff Plunge",
+        "description": "Stick-figure CEO dangling by fingertips from a violently steep red marker line chart that plunges through the floor into a bottomless white void, burning balance sheets flying through the air, high-stakes financial panic on pure white void. High drama, no text."
+      },
+      {
+        "id": "smoke_and_mirrors_split",
+        "name": "The House of Smoke & Mirrors",
+        "description": "High-contrast doodle split: left side shows a gleaming stick-figure corporate facade held up by a single shaky toothpick; right side shows the entire back wall collapsed in a roaring red-and-yellow doodle inferno, stark black ink on pure white void. Maximum visual comedy and tension, no text."
+      }
+    ],
+    "niche_topics": [
+      "The Collapse of WeWork",
+      "The Theranos Blood Testing Scam",
+      "Enron and the Accounting Fraud That Shook Wall Street",
+      "Why Kodak Missed the Digital Camera Revolution",
+      "Blockbuster vs Netflix: The Fatal Mistake",
+      "The New Coke Marketing Disaster",
+      "Fyre Festival: The Ultimate Luxury Fraud",
+      "Juicero: The  Squeezed Juice Scandal",
+      "Lehman Brothers and the 2008 Financial Crash",
+      "Nokia's Failure to Adapt to the Smartphone Era",
+      "MoviePass and the Impossible Subscription Model",
+      "Quibi: How to Lose .7 Billion in 6 Months",
+      "The Bankruptcy of Sears and Department Store Decline",
+      "Peloton's Post-Pandemic Collapse",
+      "Pets.com and the Dot-Com Bubble Burst",
+      "The Volkswagen Clean Diesel Emissions Scandal",
+      "Xerox PARC: How They Gave Away the Personal Computer",
+      "Atari and the Great Video Game Crash of 1983",
+      "Silicon Valley Bank Run Explained",
+      "The FTX Crypto Collapse and Sam Bankman-Fried"
+    ],
+    "offline_voice": "Michael·  American Male",
+    "elevenlabs_voice": "Jeremy - Young, Confident, American Male  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Michael·  American Male",
+      "elevenlabs": "Jeremy - Young, Confident, American Male  ·  ElevenLabs (Male)"
+    }
+  },
+  "bradikinin": {
+    "preset_name": "bradikinin",
+    "display_name": "Bradikinin",
+    "description": "Department of Domestic Anomalies retro civil defense PSA instructional tapes and uncanny survival guides.",
+    "voice_name": "Alice  ·  British Female",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "If Your [Domestic Entity/Object] Ever [Uncanny Behavior]... [IMPERATIVE PROTOCOL IN CAPS]",
+      "hook_style": "Clinical domestic emergency directive. Immediate bizarre anomaly statement followed by a calm, mandatory life-or-death rule.",
+      "target_words": 1600,
+      "target_duration_minutes": 8,
+      "tone": "Deadpan, hyper-formal, bureaucratic emergency advisory. Clinical detachment masking visceral cosmic and domestic horror.",
+      "pacing": "Slow, deliberate, methodical cadence, 140-155 wpm, pregnant pauses, sterile authority.",
+      "scene_density": "1 visual scene every 2-3 sentences",
+      "narrative_structure": "Chapter-based anomalous survival protocol (5-7 chapters): Chapter 1: The Incident Alert (Broadcast Interruption & Anomaly Identification) -> Chapter 2: Auditory & Environmental Deviations (Early Sensory Warnings & Room Alterations) -> Chapter 3: Primary Directives: Rules 1 Through 3 (Mandatory Physical Protocols & Non-Engagement) -> Chapter 4: The Fatal Temptation (The Deceptive Mimicry & What It Wants You To Do) -> Chapter 5: Rules 4 Through 6 (Containment, Mirror Protocol & Breathing Rules) -> Chapter 6: Protocol Breach (What Occurs If You Look Away / The Biological Cost) -> Chapter 7: Department Sign-Off (Safe Frequency Broadcast & Emergency Disclaimer)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "retro 1980s analog horror civil defense broadcast aesthetic, low-fi CRT scanlines, chromatic aberration, VHS tracking jitter, eerie muted sepia-green phosphor glow, uncanny domestic realism, liminal suburban interior, eerie silhouette, emergency instructional tape",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "photorealistic modern 4k, saturated bright glossy colors, cheerful lighting, anime, cartoon, text watermark, modern smartphone UI, lens flare, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Uncanny human or pet silhouette with subtly distorted proportions, unnatural stiffness, shadowed eye sockets or black censor bar.",
+      "environment_consistency": "Muted 1980s-1990s wood-paneled living rooms, carpeted hallways, flickering CRT TVs, dim yellowed domestic lamplight, heavy VHS noise grain.",
+      "cinematic_style": "Low-angle surveillance camera, static tripod 4:3 boxed center crop inside 16:9, VHS static noise edges, ominous stillness."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "wipeleft",
+        "wiperight",
+        "pixelize",
+        "dissolve"
+      ],
+      "video_styling": "Analog horror static VHS glitch motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Lucida Console",
+      "subtitle_font_size": 50,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.2,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00D0FFFF",
+      "subtitle_karaoke_color": "&H0000FF66",
+      "subtitle_karaoke_outline": "&H00002000",
+      "subtitle_outline_color": "&H00050E05",
+      "subtitle_back_color": "&HA0050E05",
+      "subtitle_outline_width": 2.8,
+      "subtitle_shadow": 1.6,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "glow",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 36
+    },
+    "niche_topics": [
+      "If Your Dog Ever Stands On Two Legs… ACT NORMAL",
+      "If Your Phone Ever Charges To 101%… DO NOT UNPLUG IT",
+      "If Your Microwave Bleeps At 3:14 AM… DO NOT OPEN IT",
+      "If Your Reflection Blinks Before You Do… STEP AWAY FROM THE GLASS",
+      "If Your Radio Broadcasts Yesterday's Weather… LOCK THE BASEMENT",
+      "If Your GPS Tells You To Turn Into A Solid Wall… CLOSE YOUR EYES",
+      "If Your Front Door Knocks In Threes From The Inside… STAY SILENT",
+      "If Your Smart Thermostat Drops To Minus Forty… DO NOT SHIVER",
+      "If Your Refrigerator Hum Suddenly Harmonizes… COVER YOUR EARS",
+      "If Your Ceiling Fan Starts Rotating Counter-Clockwise… DO NOT LOOK UP",
+      "If Your Cat Stares Unblinkingly At The Empty Corner… OFFER APOLOGIES",
+      "If Your Hallway Looks Ten Feet Longer At Night… WALK BACKWARDS",
+      "If Your Television Turns On Without Power… ANSWER ITS QUESTIONS",
+      "If Your Amazon Delivery Arrives With No Sender… DO NOT BRING IT INSIDE",
+      "If Your Smoke Detector Speaks In Morbid Whispers… REMOVE THE BATTERY",
+      "If You Find A Room In Your House That Wasn't On The Blueprint… SEAL THE DOOR",
+      "If Your Alarm Clock Rings At 00:00… REMAIN IN BED",
+      "If The Streetlights Outside Turn Crimson Red… DRAW THE BLINDS",
+      "If Your Tap Water Pours Upward… TURN OFF THE MAIN VALVE",
+      "If A Voice On The Landline Claims To Be You… HANG UP IMMEDIATELY"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "analog_red_alert",
+        "name": "Emergency Broadcast CRT Monolith",
+        "description": "Massive curved CRT television monitor occupying 50% of the frame glowing violently red with emergency alert bars and a static humanoid silhouette in a pitch-black 1980s suburban living room, heavy VHS scanlines, high dread, no text."
+      },
+      {
+        "id": "two_legged_anomaly",
+        "name": "The Uncanny Hallway Silhouette",
+        "description": "A domestic pet or family silhouette standing in an impossibly elongated, unnatural two-legged posture at the end of a dimly lit wood-paneled hallway, backlit by a dying amber lamp, intense VHS static grain, chilling domestic horror, no text."
+      },
+      {
+        "id": "department_classified_tape",
+        "name": "Classified Anomaly Cassette",
+        "description": "Macro focal close-up of a damaged, unspooled black VHS cassette stamped with an ominous hazard symbol resting under a single harsh yellow interrogation desk lamp on scratched stainless steel, dark shadow void, no text."
+      }
+    ],
+    "offline_voice": "Alice  ·  British Female",
+    "elevenlabs_voice": "Mother - Strong, Warm, Calm  ·  ElevenLabs (Female)",
+    "voices": {
+      "offline": "Alice  ·  British Female",
+      "elevenlabs": "Mother - Strong, Warm, Calm  ·  ElevenLabs (Female)"
+    }
+  },
+  "final_sight": {
+    "preset_name": "final_sight",
+    "display_name": "Final Sight",
+    "description": "Digital surveillance found footage and smart home security horror, night vision doorbell cams, and mimic encounters.",
+    "voice_name": "Isabella· British Female",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "If You See [Uncanny Creature/Mimic] [Location]... [URGENT PHYSICAL ACTION IN CAPS]",
+      "hook_style": "High-adrenaline security alert timestamp. Immediate reveal of footage anomaly captured on smart camera.",
+      "target_words": 1700,
+      "target_duration_minutes": 9,
+      "tone": "Paranoid, forensic, visceral suspense, urgent survival breakdown.",
+      "pacing": "Tense, breathless, accelerating momentum, 160-175 wpm.",
+      "scene_density": "1 visual scene every 2-3 sentences",
+      "narrative_structure": "Chapter-based surveillance breakdown (5-7 chapters): Chapter 1: The 03:00 AM Alert (Motion Detected & Live Camera Feed) -> Chapter 2: The Visual Discrepancy (Anatomical Irregularity & Mimic Tell) -> Chapter 3: The Sensor Glitch (Infrared Distortion & Audio Waveform Anomaly) -> Chapter 4: The Approach (Slow Doorstep Escalation & The False Familiar Face) -> Chapter 5: The Perimeter Breach (Window Tap, Handle Jiggle & Flight Protocol) -> Chapter 6: Evacuation & The Final Sight (The Law Enforcement Playback & What Came Inside)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "digital smart home security camera found footage, doorbell camera wide fish-eye lens distortion, monochrome infrared night vision, green trail camera grain, glowing digital timestamp overlay, eerie suburban porch at night, uncanny distorted humanoid creature lurking in shadows, low-light surveillance realism",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "studio lighting, clean crisp cinematic bokeh, bright daylight, cartoon, fantasy painting, smiling faces, high budget film look, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Uncanny mimic entity with overly wide smile, elongated limbs, or reflective tapetum lucidum eye shine caught in infrared.",
+      "environment_consistency": "Porch steps, suburban front yards at 3 AM, asphalt driveways under sodium vapor glow, dark forest treelines caught on trail camera.",
+      "cinematic_style": "Extreme wide-angle fish-eye security camera, subtle digital noise, high contrast infrared chiaroscuro, surveillance timestamp in corner."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "wipeleft",
+        "wiperight",
+        "dissolve",
+        "fade",
+        "rectcrop"
+      ],
+      "video_styling": "Security CCTV surveillance motion graphics with motion blur",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Bahnschrift",
+      "subtitle_font_size": 54,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.0,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0033FF00",
+      "subtitle_karaoke_outline": "&H000A1805",
+      "subtitle_outline_color": "&H000F120E",
+      "subtitle_back_color": "&HA00F120E",
+      "subtitle_outline_width": 3.0,
+      "subtitle_shadow": 1.8,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 36
+    },
+    "niche_topics": [
+      "If You See A Deer In Your Window... LEAVE THE HOUSE",
+      "If Your Dog Ever Stops Moving... DONT PET IT",
+      "If Your Mom Smiles At Your Doorbell... DO NOT OPEN IT",
+      "If You Ever See Your Dog Scream At 3AM... HIDE RIGHT NOW",
+      "If You Find Your Dog Staring At You At 3AM... DONT MOVE",
+      "If A Figure In Uniform Knocks Without A Patrol Car... DONT ANSWER",
+      "If Your Baby Monitor Picks Up Heavy Breathing... GRAB THE CHILD",
+      "If Your Driveway Motion Sensor Trips Every Ten Seconds... TURN OFF LIGHTS",
+      "If Your Trail Camera Photographs A Bipedal Elk... BURN THE MEMORY CARD",
+      "If You Hear Your Own Voice Whispering Through The Ring Speaker... CUT THE WIRES",
+      "If The Neighbor Walks Across Your Lawn Without Touching The Grass... FLEE",
+      "If The Doorbell Camera Records You Leaving While You Are Inside... LOCK ALL DOORS",
+      "If An Animal Knocks On Your Window With Human Knuckles... DO NOT LOOK OUT",
+      "If Your Security Camera Replays Yesterday's Footage At 3 AM... CHECK THE ATTIC",
+      "If A Man In A Suit Stands In The Middle Of The Street At 4 AM... DONT BLINK",
+      "If Your Window Glass Shows Scratches From The Inside... RUN TO THE CAR",
+      "If Your Smart Doorbell Detects A Face Ten Feet Above The Ground... DONT LOOK UP",
+      "If Your Pet Scratches To Come In But Is Already Sleeping Next To You... FREEZE",
+      "If A Shadow Casts Toward The Streetlight Rather Than Away... EXTINGUISH ALL FLAMES",
+      "If The Ring App Sends A Notification: 'Visitor Is Inside'... GET TO THE ROOF"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "doorbell_mimic_face",
+        "name": "The Fisheye Doorbell Intruder",
+        "description": "Extreme wide-angle doorbell camera frame showing an uncanny humanoid standing inches from the lens with an unnatural wide grin and hollow white eyes under eerie infrared glow, occupying 50% of frame, intense jump-scare dread, no text."
+      },
+      {
+        "id": "treeline_stalker_nightvision",
+        "name": "The Bipedal Treeline Entity",
+        "description": "High-grain green night-vision trail camera shot of a towering, slender quadruped creature transitioning to two legs at the forest edge, eyes reflecting intense white in sensor flash, eerie outdoor dread, no text."
+      },
+      {
+        "id": "infrared_doorway_breach",
+        "name": "The 3:00 AM Threshold Breach",
+        "description": "Black-and-white infrared security shot of a suburban front door cracked open four inches with long pale fingers gripping the wooden frame from the pitch-black exterior, high contrast chiaroscuro, no text."
+      }
+    ],
+    "offline_voice": "Isabella· British Female",
+    "elevenlabs_voice": "Don Kim  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Isabella· British Female",
+      "elevenlabs": "Don Kim  ·  ElevenLabs (Male)"
+    }
+  },
+  "cast_venk": {
+    "preset_name": "cast_venk",
+    "display_name": "CastVenk",
+    "description": "Psychological thriller rule-based survival guides merging dark domestic suspense with real psychological and cognitive experiments.",
+    "voice_name": "Fenrir ·  American Male",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "If [Psychological / Familiar Domestic Anomaly], [CHILLING RULE OR DIRECTIVE]",
+      "hook_style": "Quiet psychological cognitive dissonance. A seemingly normal domestic scene that is mathematically or psychologically wrong.",
+      "target_words": 1900,
+      "target_duration_minutes": 10,
+      "tone": "Intellectual, tense, somber, psychological dread. Scientific case study intersecting with dark urban mystery.",
+      "pacing": "Measured, deliberate, suspenseful escalation, 155-170 wpm.",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based psychological case breakdown (5-7 chapters): Chapter 1: The Cognitive Rupture (The Impossible Domestic Anomaly Hook) -> Chapter 2: The Social Consensus Trap (Asch Conformity & Group Denial) -> Chapter 3: Scientific Case Studies (Prosopagnosia, Mandela Effect & Neural Blindspots) -> Chapter 4: The 7 Survival Protocols (Identity Verification Codes & Psychological Defense) -> Chapter 5: The Escalation of Duress (The Intruding Entity's Counter-Tactics) -> Chapter 6: The Broken Mirror (The Fatal Slip & Psychological Break) -> Chapter 7: The Post-Experiment Dossier (FBI Verification Guidelines & Lingering Paranoia)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "cinematic dark psychological thriller realism, chiaroscuro lighting, deep dramatic shadows, 35mm film grain, moody suburban domestic interiors, desaturated cool tones with amber warm lamp highlights, subtle uncanny valley details, psychological case file aesthetic",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "cartoon, anime, exaggerated monster gore, fantasy glowing effects, hyper-saturated colors, flat lighting, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Realistically rendered family members in everyday casual attire, with subtle micro-expressions of emotional numbness or subtle uncanny distortion.",
+      "environment_consistency": "Suburban dining rooms, dimly lit bedrooms, family photo frames on hallways, damp rainy street views from window, rich filmic shadow tones.",
+      "cinematic_style": "David Fincher style moody cinematic framing, shallow depth of field, natural chiaroscuro domestic lighting, tension-filled compositions."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "dissolve",
+        "smoothleft",
+        "smoothright",
+        "circlecrop"
+      ],
+      "video_styling": "Psychological thriller cinematic motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Georgia",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.8,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00F5F2EB",
+      "subtitle_karaoke_color": "&H002E4BFF",
+      "subtitle_karaoke_outline": "&H00100C12",
+      "subtitle_outline_color": "&H0018141C",
+      "subtitle_back_color": "&H90100C14",
+      "subtitle_outline_width": 2.8,
+      "subtitle_shadow": 1.8,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "glow",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 38
+    },
+    "niche_topics": [
+      "If Someone New Appears in Your Family, Don't Talk To Him…",
+      "If You Ever Wake Up and Your Whole Family Is Standing Around Your Bed… PRETEND TO SLEEP",
+      "If You See Two Moons in the Sky… DON'T LOOK UP",
+      "If Your Mom Does This, Leave Your House Immediately",
+      "If You Find Your Dog Eating Cereal, Act Normal…",
+      "The Asch Conformity Trap: When Your Entire Town Pretends The Monster Isn't There",
+      "If You Wake Up In A House That Is Mirrored Backwards… DO NOT TOUCH THE WALLS",
+      "If Your Child Mentions A Friend Who Lives In The Floorboards… PACK YOUR BAGS",
+      "The Prosopagnosia Anomaly: When You Realize You Don't Recognize Your Own Face",
+      "If An Old Family Photo Shows A Figure Behind Every Relative… BURN IT",
+      "If Your Spouse Forgets Your Shared Secret Word… DO NOT SLEEP NEXT TO THEM",
+      "The Illusory Truth Experiment: How An Entire Office Was Gaslit Into Vanishing",
+      "If The Person Sitting Next To You On The Subway Has No Sclera… LOOK AT YOUR PHONE",
+      "If Your GPS Leads You To An Empty Cul-De-Sac At Twilight… DO NOT TURN OFF ENGINE",
+      "If You Receive A Voicemail From Your Own Phone Number Calling From 2035… DELETE IT",
+      "The Social Identity Glitch: Surviving A Holiday Dinner With A Hollow Relative",
+      "If You Dream Of A Red Door Three Nights In A Row… BLOCK YOUR BEDROOM DOORWAY",
+      "If Your Reflection Refuses To Leave The Mirror When You Step Back… SMASH THE FRAME",
+      "The Mandela Frequency: When You Remember A Sibling Who Never Existed",
+      "If The Police Knock At Midnight Asking For Someone With Your Exact Name… DONT OPEN"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "hollow_relative_dinner",
+        "name": "The Extra Chair At Dinner",
+        "description": "Warm golden suburban dining table with four family members laughing naturally in soft focus, while a fifth tall figure facing the camera has subtly wrong shadowed facial features and an unreadable gaze, occupying 50% of the frame, high psychological tension, no text."
+      },
+      {
+        "id": "standing_bedroom_circle",
+        "name": "The Midnight Bedroom Vigil",
+        "description": "Low-angle perspective from bed looking up at three motionless family silhouettes standing around the mattress under cold blue moonlight through sheer window curtains, extreme claustrophobic dread, no text."
+      },
+      {
+        "id": "mirrored_identity_fracture",
+        "name": "The Split Identity Discrepancy",
+        "description": "A man staring closely into a dark bathroom vanity mirror; the mirror reflection smiles faintly while the real man's face is frozen in pure horror, cinematic David Fincher chiaroscuro, no text."
+      }
+    ],
+    "offline_voice": "Fenrir ·  American Male",
+    "elevenlabs_voice": "Josh   ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Fenrir ·  American Male",
+      "elevenlabs": "Josh   ·  ElevenLabs (Male)"
+    }
+  },
+  "rainbow_yoga": {
+    "preset_name": "rainbow_yoga",
+    "display_name": "Rainbow Yoga",
+    "description": "Vibrant 3D animated kids yoga, mindfulness routines, posture flows, and playful breathing exercises.",
+    "voice_name": "Nicole ·  American Female",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "[Character/Hero]'s [Goal/Theme] Flow | Fun Kids Yoga For [Benefit]",
+      "hook_style": "Warm energetic welcome with an imaginative adventure premise (superhero training, magical animal adventure, confidence boost).",
+      "target_words": 1400,
+      "target_duration_minutes": 8,
+      "tone": "Enthusiastic, gentle, encouraging, playful, mindful, uplifting.",
+      "pacing": "Clear, cheerful, supportive, 140-155 wpm, plenty of space for movement and breathing cues.",
+      "scene_density": "1 visual scene every 2-3 sentences",
+      "narrative_structure": "Chapter-based playful movement flow (5-7 chapters): Chapter 1: The Magic Rainbow Portal (Warm Welcome, Big Breath & Posture Check) -> Chapter 2: The Sunbeam Stretch (Gentle Reaching & Morning Warm-Up) -> Chapter 3: Animal Poses: The Brave Lion & Wise Tree (Balance, Strength & Confidence Poses) -> Chapter 4: The Hero Adventure Flow (Dynamic Core Movement & Balance Challenges) -> Chapter 5: Rainbow Balloon Breathing (Deep Calming Belly Breaths & Mindful Release) -> Chapter 6: Cloud Shavasana & Golden Star Affirmations (Total Body Relaxation, Peace & Self-Love)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "vibrant 3D stylized character animation, Pixar Disney CGI aesthetic, bright pastel rainbow color palette, joyful friendly animated hero characters in colorful yoga outfits, magical sunlit fantasy meadow backdrop, glowing rainbow energy sparkles, soft rounded shapes, ultra-clean wholesome aesthetic",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "photorealistic humans, dark moody shadows, horror, grainy textures, muted dull colors, violent imagery, complex cluttered backgrounds, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Stylized 3D CGI animated character with large expressive eyes, friendly bright smile, colorful athletic yoga gear, clear locked design.",
+      "environment_consistency": "Magical sunny outdoor hills, pastel yoga mats, floating soft pastel clouds, gentle rainbow arches, bright soft studio or nature lighting.",
+      "cinematic_style": "Bright wholesome 3D animated feature film cinematography, soft depth of field, warm golden bounce light, clear centered pose visibility."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "smoothleft",
+        "smoothright",
+        "circleopen",
+        "fade",
+        "radial"
+      ],
+      "video_styling": "Vibrant cheerful animated motion graphics with soft bounces",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Trebuchet MS",
+      "subtitle_font_size": 54,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.6,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0033B3FF",
+      "subtitle_karaoke_outline": "&H002E1564",
+      "subtitle_outline_color": "&H0054238C",
+      "subtitle_back_color": "&H7054238C",
+      "subtitle_outline_width": 3.2,
+      "subtitle_shadow": 2.0,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "bounce",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 34
+    },
+    "niche_topics": [
+      "Rumi's Confidence Flow | Yoga for Confidence & Stability",
+      "Start Your Day Strong | 10-Minute Morning Kids Yoga Routine",
+      "The Superhero Focus Flow | Yoga for Better Attention & Memory",
+      "Rainbow Balloon Breathing | A 5-Minute Calming Exercise for Kids",
+      "Zoey's Brave Lion Adventure | Kids Yoga for Courage & Inner Strength",
+      "Bedtime Cloud Relaxation | Gentle Yoga Stretches for Deep Sleep",
+      "The Magical Animal Safari | Fun Stretches for Energy and Joy",
+      "Overcoming Big Feelings | Mindfulness & Breathing for Kids",
+      "Elsa's Frozen Ice Palace Stretch | Balance & Flexibility Routine",
+      "The Tree Pose Challenge | Balance & Focus Flow for Young Champions",
+      "Rainbow Mountain Hike | Active Kids Yoga for Strong Bones & Core",
+      "Underwater Dolphin Dance | Fluid Spinal Mobility Stretches",
+      "The Space Explorer Mission | Gravity-Defying Balance Yoga",
+      "Dragon Breath Fire Release | Releasing Frustration & Restoring Calm",
+      "Post-School Brain Reset | 7-Minute Movement Break for Homework Focus",
+      "The Sunshine Salutation | Step-by-Step Morning Routine for Kids",
+      "The Peaceful Turtle Shell | Safe Space Meditation and Breathing",
+      "Jungle Jaguar Agility Flow | High-Energy Coordination Stretches",
+      "The Flying Butterfly Flow | Hip Opening & Joyful Gentle Movement",
+      "Glowing Heart Meditation | Self-Love & Gratitude Yoga for Kids"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "hero_confidence_pose",
+        "name": "The Glowing Hero Warrior Pose",
+        "description": "Vibrant 3D Pixar-style animated hero child character in a dynamic superhero yoga pose on a colorful rainbow mat, glowing pastel energy aura radiating outwards, bright enchanted meadow, 50% screen dominance, ultra-inviting, no text."
+      },
+      {
+        "id": "animal_magic_tree",
+        "name": "The Magical Tree Balance Adventure",
+        "description": "3D animated character holding a graceful tree pose alongside cute enchanted cartoon animals mimicking the stretch, soft rainbow floating in sunny background, high joy, no text."
+      },
+      {
+        "id": "rainbow_breath_balloon",
+        "name": "The Giant Rainbow Breath Cloud",
+        "description": "Wholesome close-up of animated character smiling peacefully with eyes gently closed, blowing an iridescent rainbow bubble glowing with warm magical light, dreamy pastel bokeh, no text."
+      }
+    ],
+    "offline_voice": "Nicole ·  American Female",
+    "elevenlabs_voice": "Elli   ·  ElevenLabs (Female)",
+    "voices": {
+      "offline": "Nicole ·  American Female",
+      "elevenlabs": "Elli   ·  ElevenLabs (Female)"
+    }
+  },
+  "pov_wealth": {
+    "preset_name": "pov_wealth",
+    "display_name": "POV Wealth",
+    "description": "Second-person POV narrative financial stories, quiet wealth, modest millionaire choices, and compound interest freedom.",
+    "voice_name": "Heart  ·  American Female",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "POV: You [Life Milestone / Financial Dilemma] And [The Shrewd / Unexpected Outcome]",
+      "hook_style": "Second-person immersion (\"POV: You are 28 years old...\"). Relatable everyday paycheck moment contrasted with a quiet compounding turning point.",
+      "target_words": 1800,
+      "target_duration_minutes": 10,
+      "tone": "Conversational, wise, pragmatic, empathetic, grounded, motivational without hype.",
+      "pacing": "Thoughtful, steady, rhythmically reassuring, 155-170 wpm, sharp mathematical payoffs.",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based financial life arc (5-7 chapters): Chapter 1: The Pressure To Look Rich (The $800 Car Note & The Mirage of Status) -> Chapter 2: The Silent Pivot (Cutting the Leaks & The First Automated $500 Deposit) -> Chapter 3: The Grind of the Flat Curve (Months 1 Through 36 When Nothing Seems To Move) -> Chapter 4: The First $100K Flywheel (The Magic of Compound Interest Taking The Wheel) -> Chapter 5: The Test of Temptation (Colleagues Upgrading Houses While You Stay Steady) -> Chapter 6: The Quiet Millionaire (The Day Your Investments Out-Earn Your Salary) -> Chapter 7: True Autonomy (The Freedom To Walk Away & Generational Peace)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "modern editorial 2D vector character illustration, warm rich financial editorial aesthetic, creamy textured paper background, deep forest green, warm gold and navy accents, relatable modern working professional scenes, clean geometric shapes, sophisticated infographics",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "photorealism, 3d glossy render, tacky gold chains, sports car flex culture, cluttered noise, neon colors, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Relatable modern professional in simple timeless clothing (denim, plain knit sweaters, clean workwear), grounded posture.",
+      "environment_consistency": "Subtle everyday settings (subway commutes, cozy modest kitchens, bank desks, coffee shops, morning sun over quiet home office), warm editorial palettes.",
+      "cinematic_style": "Editorial magazine illustration composition, golden ratio layouts, clean negative space, integrated visual charts and lifestyle scenes."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "dissolve",
+        "smoothleft",
+        "smoothright",
+        "horzopen"
+      ],
+      "video_styling": "Editorial motion graphics with clean data reveals",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Franklin Gothic Medium",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.0,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00F7FBF8",
+      "subtitle_karaoke_color": "&H0027BD4D",
+      "subtitle_karaoke_outline": "&H000C1F13",
+      "subtitle_outline_color": "&H00142618",
+      "subtitle_back_color": "&H900C1F13",
+      "subtitle_outline_width": 2.8,
+      "subtitle_shadow": 1.6,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 36
+    },
+    "niche_topics": [
+      "POV: You Picked Real Wealth Over Looking Successful",
+      "POV: You Just Hit Your First $10,000 In Savings, And Everything Shifts",
+      "POV: You Finally Paid Off Your $45,000 Student Debt At Age 29",
+      "POV: You Realize Your Coworker With The $90K Truck Has $300 In Savings",
+      "POV: You Hit The $100K Compounding Milestone And The Curve Explodes",
+      "POV: You Refused Lifestyle Creep When Your Salary Doubled",
+      "POV: You Decide To Buy An Older Toyota Instead Of A Brand New Lease",
+      "POV: You Learn The Silent Rules Of Generational Wealth From A Plumber",
+      "POV: You Work A Modest Job But Quietly Retire At 38",
+      "POV: You Start Investing $500 A Month In An Index Fund At Age 22",
+      "POV: You Walk Into The Bank And Hand Over Your Final Mortgage Check",
+      "POV: Your Side Hustle Makes Its First $1,000 While You Sleep",
+      "POV: You Say 'No' To An Expensive Bachelor Trip To Protect Your Emergency Fund",
+      "POV: The Stock Market Drops 25% And You Go Shopping Instead Of Panicking",
+      "POV: You Discover The Secret Life Of The Millionaire Next Door In Your Suburb",
+      "POV: You Switch From Chasing Paychecks To Buying Time And Sovereignty",
+      "POV: You Calculate How Much Money You Wasted On Food Delivery Over 3 Years",
+      "POV: You Give Your Parents A Home Paid In Full After 15 Years Of Saving",
+      "POV: You Have 12 Months Of Living Expenses Cash And Zero Anxiety",
+      "POV: You Choose Peace Over Prestige: Leaving Corporate Burnout Behind"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "quiet_millionaire_contrast",
+        "name": "The Flashy Leased Luxury vs The Quiet Compounder",
+        "description": "Split frame in editorial vector style: Left shows a stressed professional in a depreciating luxury car with loan papers flying; right shows a relaxed individual sipping coffee on a modest porch while a green investment curve skyrockets into the clouds, 50% screen dominance, no text."
+      },
+      {
+        "id": "first_100k_compounding",
+        "name": "The $100K Tipping Point Flywheel",
+        "description": "Hero editorial illustration of a modest wooden workbench where small gold coin stacks suddenly ignite into a massive glowing emerald compounding turbine powering a peaceful suburban home, high aspirational pull, no text."
+      },
+      {
+        "id": "freedom_over_status",
+        "name": "The Empty Office vs Open Horizon",
+        "description": "A silhouetted professional walking away from a towering grey cubicle labyrinth toward a warm golden open countryside holding a single house key, warm textured paper aesthetic, no text."
+      }
+    ],
+    "offline_voice": "Heart  ·  American Female",
+    "elevenlabs_voice": "Rachel ·  ElevenLabs (Female)",
+    "voices": {
+      "offline": "Heart  ·  American Female",
+      "elevenlabs": "Rachel ·  ElevenLabs (Female)"
+    }
+  },
+  "genius_history": {
+    "preset_name": "genius_history",
+    "display_name": "Genius History",
+    "description": "Epic military strategy breakdowns, tactical battle maneuvers, psychological warfare, and pivotal historical decisions.",
+    "voice_name": "Aoede  ·  American Female",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "How [Commander/Empire] Used [Brilliant Tactic/Psychological Trick] To [Conquer/Defeat Impossible Odds]",
+      "hook_style": "High-stakes battlefield crisis. The commander is outnumbered 3-to-1, backed against a river, facing annihilation.",
+      "target_words": 1900,
+      "target_duration_minutes": 10,
+      "tone": "Epic, dramatic, tactical, authoritative, high-stakes military analysis.",
+      "pacing": "Punchy, aggressive momentum, 165-180 wpm, rhythmic tactical reveals.",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based tactical military breakdown (5-7 chapters): Chapter 1: The Impossible Odds (The Threat, Numerical Inferiority & Approaching Doom) -> Chapter 2: The Terrain & The Deception (Reading The Fog, The Mud & The Feigned Weakness) -> Chapter 3: The Psychological Trap (Baited Pride & The Enemy's Fatal Overconfidence) -> Chapter 4: The Springing Of The Pincer (The Flank Collapse & The Encirclement Closes) -> Chapter 5: The Tactical Masterstroke (The Decisive Shock Cavalry Charge) -> Chapter 6: The Total Rout (Anatomy Of Annihilation & The Strategic Aftermath) -> Chapter 7: The Mastermind's Legacy (The Doctrine That Rewrote The Art Of War)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "epic dark cinematic historical tableau, dramatic oil painting chiaroscuro aesthetic, vintage parchment cartographic battle maps, glowing tactical arrows and troop formation blocks, Rembrandt lighting, detailed bronze armor, smoke-filled atmospheric battlefields, dramatic cinematic scale",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "modern technology, anime, bright neon colors, flat vector doodle, low resolution, cheap 3d CGI, plastic look, blurry hands, no music, no voice-over, no narration",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Legendary military commanders in historically accurate ornate armor, cloaks, and intense resolute expressions.",
+      "environment_consistency": "Parchment war rooms with wax seals, foggy dawn hillsides, burning fortress walls, dust-swept cavalry plains, dark dramatic lighting.",
+      "cinematic_style": "Epic historical blockbuster cinematography, wide anamorphic framing, heavy chiaroscuro smoke and embers, sweeping tactical vantage."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "wipeleft",
+        "wiperight",
+        "slideleft",
+        "slideright",
+        "fade",
+        "dissolve"
+      ],
+      "video_styling": "Epic historical tactical motion graphics with kinetic map vectors",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Cinzel",
+      "subtitle_font_size": 58,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.2,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H0016B8FF",
+      "subtitle_karaoke_outline": "&H0008081A",
+      "subtitle_outline_color": "&H000C0C14",
+      "subtitle_back_color": "&HA00A0A10",
+      "subtitle_outline_width": 3.2,
+      "subtitle_shadow": 2.2,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 70,
+      "subtitle_max_chars": 34
+    },
+    "niche_topics": [
+      "The Double Envelopment At Cannae: How Hannibal Annihilated 80,000 Romans",
+      "Austerlitz: How Napoleon Tricked Two Emperors In A Single Morning",
+      "The Battle Of Carrhae: How Parthian Horse Archers Broke Rome's Richest Man",
+      "Subutai's Pincer: The Mongol Campaign That Conquered Russia In Winter",
+      "The Feigned Retreat At Hastings: How William The Conqueror Broke The Shield Wall",
+      "The Battle Of Gaugamela: How Alexander The Great Pierced Darius's Royal Center",
+      "The Siege Of Tyre: When Alexander Built A Half-Mile Highway Across The Sea",
+      "The Battle Of Alesia: How Julius Caesar Built A Wall Inside A Wall To Win",
+      "How Admiral Yi Outsmarted 133 Warships With Only 13 Turtle Ships At Myeongnyang",
+      "The Battle Of Agincourt: The English Longbow Mud Trap That Broke French Chivalry",
+      "The Battle Of Midway: The Fatal 5 Minutes That Decided The Pacific War",
+      "Saladin's Thirst Trap At The Horns Of Hattin",
+      "The Battle Of Leuctra: How Epaminondas Shattered The Myth Of Spartan Invincibility",
+      "The Battle Of Marathon: The Double Flank Charge That Saved Greece",
+      "The Psychological Terror Tactics Genghis Khan Used To Take Cities Without A Fight",
+      "The Battle Of Waterloo: The Communication Blunder That Cost Napoleon An Empire",
+      "The Battle Of Tsushima: The Naval Ambush That Stunned The Western World",
+      "The Battle Of Red Cliffs: The Burning Fleet That Divided Ancient China",
+      "The Blitzkrieg Breakthrough At Sedan: Guderian's Daring Crossing Of The Meuse",
+      "The Siege Of Constantinople (1453): How Mehmed II Rolled Warships Over Land"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "tactical_pincer_map",
+        "name": "The Glowing Tactical Envelopment Map",
+        "description": "Ancient dark parchment battle map dominating 50% of the frame with burning crimson and gold vector arrows snapping shut around a trapped Roman legion, dramatic torchlight, embers, no text."
+      },
+      {
+        "id": "commander_field_genius",
+        "name": "The Chiaroscuro Commander At Dawn",
+        "description": "Dramatic oil-painting close-up of a legendary commander on horseback on a foggy dawn ridge overlooking a vast smoke-filled battle valley, intense tactical calculation in his eyes, Rembrandt chiaroscuro, no text."
+      },
+      {
+        "id": "shattered_shieldwall_impact",
+        "name": "The Moment The Line Breaks",
+        "description": "High-tension kinetic collision of heavy shock cavalry shattering through an iron shield wall, shields fracturing into kindling, atmospheric dust and golden backlighting, high stakes, no text."
+      }
+    ],
+    "offline_voice": "Aoede  ·  American Female",
+    "elevenlabs_voice": "Michael C. Vincent  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Aoede  ·  American Female",
+      "elevenlabs": "Michael C. Vincent  ·  ElevenLabs (Male)"
+    }
+  },
+  "ink_explainer": {
+    "preset_name": "ink_explainer",
+    "display_name": "Ink Explainer",
+    "description": "Atmospheric anthropological deep dives, prehistoric human evolution, survival psychology, and the ancient origins of human nature.",
+    "voice_name": "Michael·  American Male",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "What Did Ancient Humans Actually [Fear/Do/Believe]? (The Disturbing Truth Behind [Trait/Behavior])",
+      "hook_style": "Immediate anthropological cognitive dissonance. Subverting modern assumptions with a visceral primal survival dilemma.",
+      "target_words": 1900,
+      "target_duration_minutes": 10,
+      "tone": "Atmospheric, contemplative, scientific, immersive anthropological storytelling with deep philosophical curiosity.",
+      "pacing": "Measured, rhythmic momentum, 160-175 wpm, alternating between intense survival anecdotes and evolutionary insights.",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based anthropological journey (5-7 chapters): Chapter 1: The Modern Illusion (The Counterintuitive Hook & Everyday Enigma) -> Chapter 2: The Primal Dawn (Ice Age Conditions & Evolutionary Baseline) -> Chapter 3: The Survival Catalyst (The Crisis, Hunt, Or Chemical Discovery) -> Chapter 4: The Neurological Imprint (How The Brain Adapted To Fear & Community) -> Chapter 5: The Lost Cousins (Neanderthal Encounters & Extinction Mysteries) -> Chapter 6: The Modern Echo (Why We Still Carry The Pleistocene Mind In The Digital Age)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "atmospheric primal anthropological tableau, textured charcoal and sumi-ink brushwork on dark slate rock canvas, primal campfire amber glow casting dramatic long shadows, deep earthy ochre, bone-white highlights, drifting smoke and glowing ember particles, gritty cinematic framing, evocative prehistoric realism",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "bright neon colors, cartoon, flat 2d vector, anime, plastic 3d CGI, modern clothes, modern buildings, modern technology, oversaturated colors, text, watermark, blurry faces",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Weathered, authentic prehistoric Homo sapiens with expressive observant eyes, coarse natural fur/hide clothing, firelit skin tones, and intense primal focus.",
+      "environment_consistency": "Deep limestone cave interiors with flickering torchlight, mist-covered glacial valleys, nocturnal Pleistocene savannah under vast starry skies, smoldering hearth stones.",
+      "cinematic_style": "Cinematic anthropological documentary, intimate low-angle torchlight close-ups, wide atmospheric glacial landscape vistas, deep chiaroscuro contrast."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "dissolve",
+        "fade",
+        "smoothleft",
+        "smoothright",
+        "radial"
+      ],
+      "video_styling": "Atmospheric primal anthropological storytelling with slow macro drifts",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Georgia",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.8,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00DDEEF4",
+      "subtitle_karaoke_color": "&H0028A0FF",
+      "subtitle_karaoke_outline": "&H000F151C",
+      "subtitle_outline_color": "&H0015181C",
+      "subtitle_back_color": "&HA00D1014",
+      "subtitle_outline_width": 2.8,
+      "subtitle_shadow": 1.8,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "glow",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 36
+    },
+    "niche_topics": [
+      "What Did Ancient Humans Actually Fear? (It Was Not Predators)",
+      "Why Humans Are The Only Mammal That Can Run For 24 Hours Straight",
+      "When Did Ancient Humans Start Drinking Alcohol (And Why It Built Civilization)?",
+      "The Terrifying Ways Prehistoric Humans Survived Ice Age Winters",
+      "What Did Ancient Humans Actually Do When It Rained For Weeks?",
+      "Why Neanderthals Had Larger Brains Than Us But Still Disappeared",
+      "The Disturbing Evolutionary Reason Why Humans Experience Loneliness",
+      "When Did Humans First Realize That Sex Causes Babies?",
+      "What Ancient Humans Ate On An Average Tuesday 50,000 Years Ago",
+      "Why Humans Started Cooking Food (And How It Shrunk Our Guts)",
+      "The Dark Origins Of Human Monogamy And Tribal Warfare",
+      "How Early Humans Hunted The Deadliest Beasts With Just Sharp Sticks",
+      "Why Ancient Humans Painted In Pitch-Black Caves Miles Underground",
+      "The First Human Who Discovered Fire: How An Accident Changed Biology",
+      "Why Humans Are The Only Animal That Blushes And Weeps",
+      "What Prehistoric Humans Did For Fun Before Language Existed",
+      "The 70,000-Year-Old Genetic Bottleneck That Almost Wiped Out Humanity",
+      "Why Ancient Humans Feared The Dark More Than Anything Else",
+      "How Hunter-Gatherers Slept: The Truth About Biphasic Sleep",
+      "The Bizarre Rituals Ancient Humans Used To Explain Death"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "primal_predator_firelight",
+        "name": "The Primal Stare In The Ember Glow",
+        "description": "Ultra-dramatic prehistoric human face occupying 50% of the frame illuminated by fierce flickering campfire light, dilated pupils reflecting a looming towering saber-toothed beast silhouette in the pitch-black cave entrance, glowing orange ember particles drifting, deep charcoal slate background, high tension, no text."
+      },
+      {
+        "id": "mammoth_abyss_hunt",
+        "name": "The Edge Of The Glacial Abyss",
+        "description": "Lone prehistoric hunter silhouetted against a gigantic woolly mammoth skull buried in glacial ice, glowing torch held high casting long dynamic shadows across fractured permafrost, dark moody atmospheric blizzard haze, extreme scale contrast, no text."
+      },
+      {
+        "id": "first_spark_discovery",
+        "name": "The First Spark",
+        "description": "Extreme macro close-up of two rough flint stones striking together, freezing a brilliant blinding white-hot spark erupting between weathered dirt-stained prehistoric hands, deep obsidian cave shadows, sudden dramatic illumination, intense curiosity, no text."
+      }
+    ],
+    "offline_voice": "Michael·  American Male",
+    "elevenlabs_voice": "George - Warm, Captivating Storyteller  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Michael·  American Male",
+      "elevenlabs": "George - Warm, Captivating Storyteller  ·  ElevenLabs (Male)"
+    }
+  },
+  "built_on_you": {
+    "preset_name": "built_on_you",
+    "display_name": "Built On You",
+    "description": "Cinematic chronological corporate documentaries, founder origin epics, high-stakes boardroom gambles, and business empire histories.",
+    "voice_name": "Adam   ·  American Male",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "The ENTIRE History of [Brand/Empire]: From [Humble Garage/Crisis] to [Trillion-Dollar Giant/Collapse]",
+      "hook_style": "Definitive chronological scope promise paired with an extreme high-stakes founder near-death bankruptcy dilemma.",
+      "target_words": 2200,
+      "target_duration_minutes": 12,
+      "tone": "Authoritative, investigative, cinematic, balanced corporate journalism, dramatic tension without hype.",
+      "pacing": "Steadily accelerating momentum, 165-180 wpm, layered narrative rhythm with pivotal financial turning points.",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based corporate empire arc (6-7 chapters): Chapter 1: The Outlier Origin (The Garage Genesis & The Absurd Gamble) -> Chapter 2: The Breakthrough Disruption (Cracking The Market & The First Millions) -> Chapter 3: The Brink Of Bankruptcy (The Bet-The-Company Crisis & Executive Bloodbath) -> Chapter 4: The Ruthless Counter-Offensive (Crushing Rivals & The Monopoly Strategy) -> Chapter 5: The Golden Era Of Dominance (Wall Street Triumph & Cultural Empire) -> Chapter 6: The Modern Scandal & Reckoning (Regulatory Crosshairs & Succession Dilemma) -> Chapter 7: The Lasting Doctrine (The Management Principles That Built The Empire)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "cinematic archival corporate documentary collage, 2.5D multi-plane parallax depth, aged executive patent schematics, vintage typewriter typography, textured newspaper grain, rich executive mahogany and deep forest green palette, subtle film burn light leaks, high-contrast monochrome founder portraits with golden duotone highlights",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "bright cartoon, anime, low-fi vector, plastic 3d toy render, messy chaotic composition, unreadable text artifacts, watermark, low quality, oversaturated rainbows",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Sharp, era-accurate iconic business founders and visionary CEOs in vintage bespoke suits, rolled-up shirtsleeves in gritty workrooms, intense calculated expressions.",
+      "environment_consistency": "Smoky 1970s wood-paneled executive boardrooms, cluttered suburban garages with CRT monitors and cardboard boxes, gleaming modern glass skyscraper atriums at dusk.",
+      "cinematic_style": "Archival multi-plane documentary cinematography, slow dramatic 3D parallax glides over vintage contracts, intimate low-key executive portraiture."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "fade",
+        "dissolve",
+        "horzopen",
+        "vertopen",
+        "smoothright"
+      ],
+      "video_styling": "Cinematic archival corporate documentary with 2.5D multi-plane parallax",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Franklin Gothic Medium",
+      "subtitle_font_size": 54,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.0,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00F6F9F9",
+      "subtitle_karaoke_color": "&H003BB8E5",
+      "subtitle_karaoke_outline": "&H00101418",
+      "subtitle_outline_color": "&H00181412",
+      "subtitle_back_color": "&H90100D0C",
+      "subtitle_outline_width": 3.0,
+      "subtitle_shadow": 1.8,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 68,
+      "subtitle_max_chars": 36
+    },
+    "niche_topics": [
+      "The ENTIRE History of Amazon: From Garage Bookseller To $2 Trillion Empire",
+      "The ENTIRE History of Nintendo: From 1889 Yakuza Playing Cards To Global Gaming Titan",
+      "How Walmarts Founder Destroyed Small-Town Retail and Built a Retail Monolith",
+      "The ENTIRE History of Microsoft: The 1980 IBM Deal That Changed Computing Forever",
+      "How Toyota Out-Manufactured Detroit and Created The Worlds Most Reliable Cars",
+      "The Ruthless Rise of Nike: How Phil Knight Smuggled Japanese Shoes From His Car Trunk",
+      "The ENTIRE History of Apple: From Steves Cupertino Garage To $3 Trillion Tech Sovereign",
+      "How Ferrari Beat Ford In Racing Lore: The Feud That Built A Supercar Legend",
+      "The Collapse and Resurrection of Lego: How The Danish Brick Nearly Vanished in 2003",
+      "How Sony Invented The Walkman, Conquered Pop Culture, and Lost The Digital Age",
+      "The ENTIRE History of Boeing: From Alaskan Spruce Biplanes To Commercial Aviation Giant",
+      "How McDonalds Turned Cheap Hamburgers Into A Global Real Estate Empire",
+      "The Untold Story of Rolex: How Hans Wilsdorf Created The Ultimate Luxury Status Symbol",
+      "The ENTIRE History of Intel: The Silicon Valley Pioneers Who Power The Worlds Chips",
+      "How Ikea Conquered Flat-Pack Furniture And Created A Global Design Cult",
+      "The Rise, Fall, and Rebirth of Marvel: From 1996 Bankruptcy To Cinema Dominance",
+      "How Red Bull Created An Extreme Sports Empire Out Of A Thai Trucker Tonic",
+      "The ENTIRE History of Porsche: Ferdinands Engineering Legacy And The 911 Icon",
+      "How Netflix Crushed Blockbuster And Upended Hollywoods 100-Year Movie Monopoly",
+      "The ENTIRE History of SpaceX: How Elon Musk Bet His Last $30 Million On Falcon 1"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "garage_to_skyscrapers_split",
+        "name": "The Garage vs. Empire Parallax",
+        "description": "High-contrast archival collage: left side shows a gritty black-and-white 1970s suburban garage with a lone wooden desk and cluttered cardboard boxes; right side seamlessly bursts into a towering modern glass skyscraper illuminated by golden executive boardroom light, layered vintage patent schematics floating in mid-air, no text."
+      },
+      {
+        "id": "the_bankruptcy_brink",
+        "name": "The $0 Balance Sheet",
+        "description": "A dramatic high-angle view of a solitary founder in an empty corporate hallway late at night, surrounded by towering stacks of eviction notices and ledger books, dramatic down-light casting an ominous elongated shadow toward a single glowing boardroom door, deep mahogany and dark navy tones, no text."
+      },
+      {
+        "id": "the_monopoly_architect",
+        "name": "The Architects War Room",
+        "description": "Close-up of a resolute visionary founder standing over a massive mahogany table covered in overlapping global logistical maps with gold pins and red supply chain vectors, hands planted firmly, warm vintage executive chiaroscuro lighting, no text."
+      }
+    ],
+    "offline_voice": "Adam   ·  American Male",
+    "elevenlabs_voice": "Jonathan - Professional, Calm, Credible, Clear  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Adam   ·  American Male",
+      "elevenlabs": "Jonathan - Professional, Calm, Credible, Clear  ·  ElevenLabs (Male)"
+    }
+  },
+  "terrain_walk": {
+    "preset_name": "terrain_walk",
+    "display_name": "Terrain Walk",
+    "description": "Tactical military battle breakdowns, 3D digital elevation models, line-of-sight topographical analysis, and ground-level infantry/tank maneuver geometry.",
+    "voice_name": "Adam   ·  American Male",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "How [Small Force/Tanks] Beat [Overwhelming Numbers] In [Sandstorm/Fog/Chokepoint]: The Battle of [Engagement]",
+      "hook_style": "Immediate tactical crisis on the ground. A tiny force is hopelessly outgunned until the terrain geometry shifts the equation.",
+      "target_words": 2000,
+      "target_duration_minutes": 11,
+      "tone": "Crisp, clinical, authoritative military tactical analysis, intense battlefield momentum, zero sensationalism.",
+      "pacing": "Punchy, calculated, rhythmic delivery, 165-180 wpm, synchronizing perfectly with tactical elevation reveals.",
+      "scene_density": "1 visual scene every 3 sentences",
+      "narrative_structure": "Chapter-based tactical ground breakdown (5-7 chapters): Chapter 1: The Disadvantage (Outnumbered In The Killing Zone) -> Chapter 2: The Topographical Terrain (Reading The Ridges, Reverse Slopes & Dead Space) -> Chapter 3: The Environmental Cloak (Fog, Sandstorm & Blind Armor Sights) -> Chapter 4: The Opening Volley & Flank Breach (Exploiting The Elevation Advantage) -> Chapter 5: The Armor Clash (Knife-Fight Range In The Ravine) -> Chapter 6: The Decisive Maneuver (Cutting The Withdrawal Route & Overrun) -> Chapter 7: The After-Action Review (Why Topography Trumps Numerical Superiority)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "high-precision 3D digital elevation model terrain visualization, photorealistic satellite relief topography, glowing contour elevation lines, tactical NATO unit military symbols, glowing range rings, line-of-sight elevation cones, dynamic thermal weather overlays, military grid coordinates, dark tactical command aesthetics",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "fantasy magic, cartoon, bright cartoon colors, plastic toy soldiers, blurry elevation, distorted terrain, unreadable text, low resolution",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Elite armor crewmen, forward observers, and infantry platoon leaders in authentic combat gear with mud-spattered helmets, looking through binoculars or thermal sights.",
+      "environment_consistency": "Rugged tactical ridgelines, arid Iraqi desert wadis during orange duststorms, mist-shrouded French bocage hedgerows, snow-covered Ardennes forest passes with tracked mud ruts.",
+      "cinematic_style": "Precision military GIS telemetry flyover, sweeping 3D terrain perspective dips into ravines, thermal infrared weapon sight cutaways, crisp topographic clarity."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "wipeleft",
+        "wiperight",
+        "circlecrop",
+        "fade",
+        "dissolve"
+      ],
+      "video_styling": "3D topographical tactical military visualization with elevation tracking",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Consolas",
+      "subtitle_font_size": 52,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.5,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00E0FFFF",
+      "subtitle_karaoke_color": "&H0000E5FF",
+      "subtitle_karaoke_outline": "&H00000000",
+      "subtitle_outline_color": "&H00000A05",
+      "subtitle_back_color": "&HB0000000",
+      "subtitle_outline_width": 3.2,
+      "subtitle_shadow": 2.0,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "pop",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 34
+    },
+    "niche_topics": [
+      "How 9 Tanks Beat 50 In A Sandstorm: The Battle Of 73 Easting (Desert Storm)",
+      "How Outgunned Shermans Destroyed 43 German Panthers In Thick Fog (Arracourt 1944)",
+      "How 13 Men Neutralized 60 Germans On D-Day: The Real Brecourt Manor Tactical Assault",
+      "The Dead Space Ambush At Ia Drang: How LZ X-Ray Survived Total Encirclement",
+      "How 300 Spartans Exploited The Narrow Phalanx Chokepoint At Thermopylae",
+      "The Reverse Slope Trap At Waterloo: How Wellington Hid 30,000 Men Behind A Ridge",
+      "Why The Germans Could Not Cross The Meuse At Sedan: The 1940 River Assault Breakdown",
+      "The Ridge Defense At Bloody Ridge: How 800 Marines Held Off 3,000 Japanese At Guadalcanal",
+      "How Russian T-34s Swarmed German Tigers At Kursk: The Prokhorovka Terrain Map",
+      "The High Ground Catastrophe At Dien Bien Phu: How French Artillery Lost The Valley",
+      "The Ardennes Chokepoint Trap: How Bastognes Road Hub Halted Hitlers Winter Offensive",
+      "How The British Longbows Used Mud and Wooden Stakes At Agincourt To Defeat Chivalry",
+      "The Micro-Terrain Defense At Hamburger Hill: Why Ap Bia Mountain Cost 72 Lives",
+      "How General Patton Used Speed And Snow Defiles To Relieve The 101st Airborne",
+      "The Ambush At Long Tan: How 108 ANZAC Troops Held Off 2,500 In A Rubber Plantation",
+      "Why Market Gardens Single Highway Became A 64-Mile Death Corridor",
+      "How The Desert Rats Used Wadi Depressions To Ambush Rommels Panzers At El Alamein",
+      "The Urban Chokepoints Of Ortona: How Canadian Troops Invented Mouse-Holing In 1943",
+      "How Rommel Exploited The Halfaya Pass Chokepoint With Concealed 88mm Anti-Tank Guns",
+      "The Defensive Geometry Of The Bar Lev Line: How Egyptian Sapper Water Cannons Breached It"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "sandstorm_tank_ambush",
+        "name": "The Sandstorm Thermal Ambush",
+        "description": "High-angle 3D elevation terrain view of a desolate desert ridge during a roaring orange sandstorm; a lone American Abrams tank on the crest locks its glowing thermal green targeting sight onto a cluster of enemy tanks trapped in the low-lying wadi dead space below, contour elevation lines glowing softly, no text."
+      },
+      {
+        "id": "fog_valley_armor_clash",
+        "name": "The Arracourt Fog Ridge",
+        "description": "3D topographical perspective of a rolling European farmland valley choked in dense morning fog; concealed Sherman tanks positioned in the reverse slope tree line firing down into the exposed flank of heavy German tanks crossing the mud road, smoke plumes rising, no text."
+      },
+      {
+        "id": "dday_bunker_flank_vector",
+        "name": "The Trench Line Breaching Angle",
+        "description": "Topographical tactical visualization of a sunken hedgerow lane and concrete artillery bunker; glowing tactical squad maneuver arrows showing small fire teams looping around the dead space behind the machine gun embrasure, explosive muzzle flash illuminating the wet earth, no text."
+      }
+    ],
+    "offline_voice": "Adam   ·  American Male",
+    "elevenlabs_voice": "Josh   ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Adam   ·  American Male",
+      "elevenlabs": "Josh   ·  ElevenLabs (Male)"
+    }
+  },
+  "go_documentaries": {
+    "preset_name": "go_documentaries",
+    "display_name": "Go Documentaries",
+    "description": "Monumental mega-engineering investigations, geopolitical chokepoints, extreme infrastructure marvels, and planetary logistics.",
+    "voice_name": "Michael·  American Male",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "How [Country/Engineers] [Solved Impossible Problem/Built Wonder] With [Extreme Mega-Engineering] (And Why It Almost Failed)",
+      "hook_style": "Monumental engineering paradox: posing an impossible geographic constraint that should violate the laws of physics or logistics.",
+      "target_words": 2100,
+      "target_duration_minutes": 11,
+      "tone": "Cinematic, awe-inspiring, intellectually rigorous, investigative engineering journalism with pristine technical clarity.",
+      "pacing": "Grand, deliberate, escalating momentum, 160-175 wpm, alternating between staggering physical scales and micro-engineering breakthroughs.",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based mega-engineering arc (6 chapters): Chapter 1: The Impossible Geography (The Planetary Chokepoint Or Arid Crisis) -> Chapter 2: The Radical Blueprint (The Unorthodox Engineering Scheme That Defied Conventional Wisdom) -> Chapter 3: The Subterranean / Marine Battle (Taming Ocean Pressures, Desert Heat & Shifting Tectonic Plates) -> Chapter 4: The Extreme Machinery (Custom Mega-Boring Drills & Massive Hydraulic Systems) -> Chapter 5: The Near-Catastrophe Crisis (The Structural Crack, Flash Flood Or Financial Run) -> Chapter 6: The Modern Arteries (How This Single Megastructure Anchors The Global Economy)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "hyper-realistic 3D isometric architectural cutaways, structural cross-sections showing foundation piles and subterranean pipes, wireframe blueprint transitions into photorealistic engineering renders, satellite geospatial zoomouts, technical metric callouts, warm golden-hour architectural lighting, pristine cinematic clarity, grand engineering scale",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "cartoon, 2d doodle, low polygon, plastic textures, blurry water, bad perspective, inaccurate physics, flat lighting, text artifacts, watermark",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Hardhat-wearing structural engineers and geotechnical specialists surveying colossal machinery, inspecting concrete foundation vaults, standing on dizzying observation decks.",
+      "environment_consistency": "Massive concrete dam spillways churning white water, deep sub-sea tunnel boring vaults, gleaming desert solar-desalination megastructures, bustling deep-water shipping straits at dusk.",
+      "cinematic_style": "Sweeping IMAX architectural cinematography, smooth 3D isometric cutaways floating in space, technical blueprint overlay dissolves, monumental low-angle scale."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "smoothleft",
+        "smoothright",
+        "dissolve",
+        "fade",
+        "horzopen"
+      ],
+      "video_styling": "Hyper-detailed mega-engineering 3D cutaway and isometric technical motion graphics",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Bahnschrift",
+      "subtitle_font_size": 54,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 1.2,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H00FFD400",
+      "subtitle_karaoke_outline": "&H000A1A24",
+      "subtitle_outline_color": "&H000A141E",
+      "subtitle_back_color": "&H90081018",
+      "subtitle_outline_width": 2.8,
+      "subtitle_shadow": 1.6,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "glow",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 36
+    },
+    "niche_topics": [
+      "The Strait Of Hormuz Trap: Why The Worlds Most Critical Oil Chokepoint Has No Exit",
+      "How A Country With Zero Rivers Drinks Water: Saudi Arabias Mega-Desalination Grid",
+      "Why Isnt Dubais Palm Jumeirah Sinking? The Extreme Ocean Engineering Behind The Island",
+      "How The 3,000-Year-Old Suez Canal Was Carved Through 120 Miles Of Shifting Desert",
+      "How Did Venice Build A Stone Empire On Water With 10 Million Wooden Tree Trunks?",
+      "The Impossible Panama Canal Expansion: How Engineers Lifted 1,200-Foot Ships Over A Mountain",
+      "How The Three Gorges Dam Slowed Earths Rotation: The Scale Of The Worlds Biggest Dam",
+      "The Millau Viaduct: How France Built A Highway That Floats Above The Clouds",
+      "How The Channel Tunnel Connected Britain And France 150 Feet Beneath The Sea",
+      "The Megastructure Sinking In San Francisco: The 58-Story Millennium Tower Engineering Crisis",
+      "How Singapore Turns Sewage Into Ultra-Pure Drinking Water With Zero Natural Lakes",
+      "The Gotthard Base Tunnel: Drilling 35 Miles Through Solid Alpine Granite",
+      "Why The Leaning Tower Of Pisa Stopped Leaning: The Soil Extraction Miracle",
+      "How The Burj Khalifa Survives 100 MPH Desert Winds At Half A Mile High",
+      "The MOSE Barrier: The $6 Billion Floating Steel Dam Fighting Venices Rising Tides",
+      "How The Netherlands Reclaimed 27% Of Its Entire Country From The North Sea",
+      "The Itaipu Dam: The Megastructure That Powers Two Entire Nations",
+      "How The Hoover Dam Cured Concrete For 50 Years In 115-Degree Nevada Desert",
+      "The Danyang-Kunshan Grand Bridge: Building A 102-Mile Viaduct Over Water And Quicksand",
+      "How Japan Built Kansai Airport On A Sinking Man-Made Island In Osaka Bay"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "strait_chokepoint_blockade",
+        "name": "The Chokepoint Stranglehold",
+        "description": "Ultra-wide photorealistic satellite perspective of a narrow maritime strait between dramatic sheer mountain cliffs, where a gigantic ultra-large container ship is angled dangerously across the shipping channel, surrounding waters filled with glowing golden maritime shipping lanes abruptly choked to a halt, sunset lighting, no text."
+      },
+      {
+        "id": "desert_water_aqueduct_cutaway",
+        "name": "The Subterranean Water Highway",
+        "description": "Breathtaking 3D architectural cross-section cutaway showing a scorched, endless red desert surface, sliced open to reveal massive 5-meter pressurized steel water pipelines and glowing blue underground aquifer reservoirs roaring beneath the dunes, extreme scale, no text."
+      },
+      {
+        "id": "floating_foundation_monolith",
+        "name": "The Island That Defies Gravity",
+        "description": "Isometric cutaway render of a luxury artificial palm island in turquoise ocean waters, revealing thousands of massive vibrating stone compaction piles driven into the seabed to hold back liquefaction, dramatic engineering precision, no text."
+      }
+    ],
+    "offline_voice": "Michael·  American Male",
+    "elevenlabs_voice": "Jonathan - Professional, Calm, Credible, Clear  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Michael·  American Male",
+      "elevenlabs": "Jonathan - Professional, Calm, Credible, Clear  ·  ElevenLabs (Male)"
+    }
+  },
+  "nostalgia_rock": {
+    "preset_name": "nostalgia_rock",
+    "display_name": "Nostalgia Rock",
+    "description": "Emotionally charged classic rock history, 1950s-1980s music tragedies, forgotten one-hit wonders, heartbreaking song lore, and vanished musical legends.",
+    "voice_name": "Fenrir ·  American Male",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "The [Saddest/Most Tragic] [Song/Rock Band] Of The [1970s/1980s] That [Broke Millions Of Hearts/Vanished Without A Trace]",
+      "hook_style": "Deep emotional nostalgia and high-stakes musical tragedy. A legendary melody that concealed a devastating personal heartbreak.",
+      "target_words": 2100,
+      "target_duration_minutes": 11,
+      "tone": "Soulful, nostalgic, haunting, cinematic rock-and-roll retrospective with deep emotional empathy and melancholic reverence.",
+      "pacing": "Warm, rhythmic, soulful storytelling, 155-170 wpm, pausing for musical resonance and poignant lyrical milestones.",
+      "scene_density": "1 visual scene every 3-4 sentences",
+      "narrative_structure": "Chapter-based musical retrospective (6 chapters): Chapter 1: The Melody That Haunted A Generation (The Heartbreaking Hook) -> Chapter 2: The Hungry Basement Years (The Rise, The Chemistry & The Golden Album) -> Chapter 3: The Secret Agony (Addiction, Betrayal & The Cracking Facade) -> Chapter 4: The 3 A.M. Recording Session (The Improvised Masterpiece Born In Grief) -> Chapter 5: The Sudden Shattering (The Final Concert, The Crash Or The Vanishing) -> Chapter 6: The Ghost In The Vinyl (Why This Song Still Brings Grown Men To Tears Decades Later)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "vintage rock-and-roll 35mm photography aesthetic, authentic Kodachrome and Ektachrome film grain, warm analog color grading, moody concert stage spotlights through haze and smoke, worn vinyl record grooves, vintage Fender amplifiers and microphone close-ups, 1970s psychedelic gatefold album typography, intimate archival backstage photography, deep soulful amber and sepia tones",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "modern digital clean, 3d CGI, plastic sheen, anime, flat modern vector, mobile phones, modern laptops, oversaturated neon, text artifacts, watermark",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Charismatic, weathered 1970s and 1980s rock musicians with authentic shaggy hair, leather jackets, vintage aviators, singing into vintage microphones with raw visceral emotion.",
+      "environment_consistency": "Smoky analog sound studios with reel-to-reel tape decks, packed 1970s stadium stages with wall-of-sound Marshall stacks, late-night rain-slicked roadside diners with glowing neon signs.",
+      "cinematic_style": "Candid 35mm documentary rock cinematography, evocative slow push-ins on vintage record players and guitar fretboards, warm analog halation and stage light flares."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "dissolve",
+        "fade",
+        "smoothleft",
+        "radial",
+        "pixelize"
+      ],
+      "video_styling": "Vintage 35mm rock-and-roll analog film retrospective with warm stage lighting",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Impact",
+      "subtitle_font_size": 62,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.6,
+      "subtitle_uppercase": true,
+      "subtitle_primary_color": "&H00E6F5FF",
+      "subtitle_karaoke_color": "&H000077FF",
+      "subtitle_karaoke_outline": "&H000A0505",
+      "subtitle_outline_color": "&H00100808",
+      "subtitle_back_color": "&HB00A0505",
+      "subtitle_outline_width": 3.6,
+      "subtitle_shadow": 2.5,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "bounce",
+      "subtitle_margin_v": 70,
+      "subtitle_max_chars": 32
+    },
+    "niche_topics": [
+      "The 15 Saddest Songs Of The 1970s No One Can Listen To Without Crying",
+      "The 10 Saddest Songs Of The 1980s That Broke Millions Of Hearts",
+      "The Forgotten 80s Band That Sold 10 Million Records Then Vanished Without A Trace",
+      "10 One-Hit Wonders Everyone Remembers From 1975: The Tragic Stories Behind The Hits",
+      "The Heartbreaking Final Recording Session Of Freddie Mercury And Queen",
+      "Why Creedence Clearwater Revival Broke Up At Their Absolute Peak In 1972",
+      "The 1977 Plane Crash That Shattered Lynyrd Skynyrd: What Really Happened",
+      "The Tragic Disappearance Of Richey Edwards: Rocks Most Chilling Unsolved Mystery",
+      "How Fleetwood Mac Recorded Rumours While Secretly Hating Each Others Guts",
+      "The 15 Catchiest Classic Rock Riffs Of The 1960s You Never Got Out Of Your Head",
+      "The Dark True Story Behind Eric Claptons Tears In Heaven",
+      "10 Forgotten Hard Rock Gems Of The 1970s That Still Hit Harder Than Modern Rock",
+      "The Tragic 27 Club: The Uncanny Curse That Took Hendrix, Joplin, And Morrison",
+      "How Led Zeppelin Stole Their Greatest Riffs (And Still Conquered Stadium Rock)",
+      "The Day The Music Died: The 1959 Plane Crash That Changed Rock And Roll Forever",
+      "Why The Eagles Ended Up In A $25 Million Fistfight In Long Beach",
+      "The 10 Most Shocking Backstage Scandals In 1970s Rock History",
+      "The Forgotten Soul Singer Whose Hit Song Saved Motown From Bankruptcy",
+      "How Pink Floyd Created The Dark Side Of The Moon In Absolute Creative Agony",
+      "The Last Days Of John Bonham And The Sudden End Of Led Zeppelin"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "empty_spotlight_microphone",
+        "name": "The Ghost At The Microphone",
+        "description": "An empty vintage chrome Shure microphone standing on a dark, smoke-filled wooden concert stage under a solitary piercing warm amber spotlight, guitar feedback haze in the air, a battered 1970s sunburst Stratocaster leaning against an amplifier in the shadows, deep melancholic nostalgia, no text."
+      },
+      {
+        "id": "shattered_vinyl_master",
+        "name": "The Broken Golden Record",
+        "description": "Extreme close-up of a classic 1970s black vinyl record cracked down the center, with golden light bursting through the fracture, resting on a worn leather tour road case surrounded by vintage cassette tapes and scribbled lyrics, warm Kodachrome film grain, no text."
+      },
+      {
+        "id": "backstage_solitary_genius",
+        "name": "The Backstage Silhouette",
+        "description": "Gritty 35mm candid perspective from a dark backstage stadium tunnel; a solitary legendary rock frontman holding his head in his hands right before stepping into the blinding roar of a 50,000-person stadium light wall, intense emotional contrast, no text."
+      }
+    ],
+    "offline_voice": "Fenrir ·  American Male",
+    "elevenlabs_voice": "Steve  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Fenrir ·  American Male",
+      "elevenlabs": "Steve  ·  ElevenLabs (Male)"
+    }
+  },
+  "psych_toons": {
+    "preset_name": "psych_toons",
+    "display_name": "Psych Toons",
+    "description": "Clean psychological explainer animations, dark triad analysis, social intelligence frameworks, cognitive biases, and mental resilience models.",
+    "voice_name": "Michael·  American Male",
+    "video_language": "English",
+    "content_automation": {
+      "title_structure": "Psychology of [Topic/Social Trait]: How To [Outsmart Anyone/Never Run Out Of Things To Say/Read Anyone Instantly]",
+      "hook_style": "Immediate psychological validation of a universal social pain point or an unfair cognitive advantage.",
+      "target_words": 1900,
+      "target_duration_minutes": 10,
+      "tone": "Sharp, insightful, empowering, conversational pop-psychology, intellectually crisp with zero academic fluff.",
+      "pacing": "Punchy, engaging, upbeat momentum, 165-180 wpm, clear mental shifts punctuated by memorable psychological laws.",
+      "scene_density": "1 visual scene every 2-3 sentences",
+      "narrative_structure": "Chapter-based cognitive framework (5-6 chapters): Chapter 1: The Social Blind Spot (The Painful Reality & The 1% Counter-Intuitive Truth) -> Chapter 2: The Cognitive Architecture (Why Human Psychology Is Hardwired To React This Way) -> Chapter 3: The Dark Triad & Machiavellian Trap (How Toxic Manipulators Weaponize This Dynamic) -> Chapter 4: The 4-Step Mental Framework (The Exact Internal Shift To Reclaim Power) -> Chapter 5: Real-World Social Scenarios (Word-For-Word Examples In High-Stakes Situations) -> Chapter 6: The Unshakeable Mindset (Integrating The Shadow & Effortless Composure)",
+      "chapter_format": "[Chapter: <Title>]"
+    },
+    "image_automation": {
+      "visual_style": "minimalist 2D psychological character cartoon animation, smooth rounded vector shapes, clean modern pastel dark slate canvas (#1A1E29), vivid electric violet (#A855F7) and electric cyan (#06B6D4) glowing accent elements, expressive cartoon avatars, visual psychological metaphors (glowing brain neurons, shadow silhouettes, chess pieces, puppet strings, cracked masks), high graphic novel linework clarity, crisp flat design",
+      "aspect_ratio": "16:9",
+      "negative_prompt": "photorealism, 3d hyper-detailed CGI, gritty textures, muddy dark gradients, chaotic busy backgrounds, warped hands, ugly faces, text artifacts, watermark",
+      "model": "Imagen 3",
+      "generation_mode": "image",
+      "character_consistency": "Clean, expressive minimalist 2D stylized cartoon characters with solid dark hair, distinct posture, and highly readable emotional expressions (calm stoicism, smirking confidence, curious calculation).",
+      "environment_consistency": "Abstract conceptual psychological stages: floating geometric platforms, clean modern minimalist rooms, stark spotlight cones on dark slate void (#1A1E29).",
+      "cinematic_style": "Dynamic 2D animation storyboarding, crisp figure-ground separation, punchy framing shifts from wide mental diagrams to expressive character reaction close-ups."
+    },
+    "video_forge": {
+      "allowed_transitions": [
+        "smoothleft",
+        "smoothright",
+        "circleopen",
+        "fade",
+        "dissolve"
+      ],
+      "video_styling": "Clean 2D animated psychological explainer with kinetic character motion",
+      "sub_mode": "karaoke",
+      "sub_position": "bottom_center",
+      "subtitle_font": "Trebuchet MS",
+      "subtitle_font_size": 56,
+      "subtitle_bold": true,
+      "subtitle_italic": false,
+      "subtitle_spacing": 0.5,
+      "subtitle_uppercase": false,
+      "subtitle_primary_color": "&H00FFFFFF",
+      "subtitle_karaoke_color": "&H00F755A8",
+      "subtitle_karaoke_outline": "&H0024101A",
+      "subtitle_outline_color": "&H00201624",
+      "subtitle_back_color": "&H80181020",
+      "subtitle_outline_width": 3.0,
+      "subtitle_shadow": 2.0,
+      "subtitle_border_style": 1,
+      "subtitle_alignment": 2,
+      "subtitle_animation": "bounce",
+      "subtitle_margin_v": 65,
+      "subtitle_max_chars": 34
+    },
+    "niche_topics": [
+      "Psychology Of Social Intelligence: How To Read Anyone Instantly In 60 Seconds",
+      "How To Deal With People Who Disrespect You (Without Ever Losing Your Cool)",
+      "Psychology Of Verbal Intelligence: How To Articulate Complex Thoughts With Razor Precision",
+      "Psychology Of Machiavellianism: Why Trying To Please Everyone Guarantees Failure",
+      "The Psychology Of Not Giving A F*ck: How To Detach From Outcome Anxiety",
+      "Psychology Of The Shadow: Why Integrating Your Dark Side Is The Secret To Inner Strength",
+      "The 6 Dangerous Personality Types Psychology Warns You Must Avoid At All Costs",
+      "Psychology Of Composure: How To Stay So Calm In Chaos It Intimidates Others",
+      "Why Some People Are Meant To Walk Alone: The Psychology Of The Solitary Mindset",
+      "Psychology Of Confidence: How To Stop Seeking External Validation Forever",
+      "The Danger Of Seeing What Others Do Not: The Cognitive Burden Of High Perception",
+      "10 Psychological Habits That Build An Unshakeable Bulletproof Mindset",
+      "Psychology Of Discipline: How To Trick Your Dopamine System Into Loving Hard Work",
+      "Psychology Of Charisma: The Micro-Behaviors That Make Anyone Magnetic Instantly",
+      "Psychology Of Power: How To Establish Dominance Without Saying A Single Word",
+      "Psychology Of People Who Go Completely Quiet When They Are Deeply Hurt",
+      "The Cognitive Trap Of Overthinking: How To Break The Rumination Loop In 5 Minutes",
+      "Psychology Of Problem Solving: 10 Mental Models To Navigate Crisis On Easy Mode",
+      "Why High Intelligence Often Leads To Deep Social Isolation (And The Antidote)",
+      "Psychology Of Resilience: Building A Mind So Unyielding That Failure Becomes Fuel"
+    ],
+    "thumbnail_styles": [
+      {
+        "id": "the_shadow_puppet_mind",
+        "name": "The Shadow Master",
+        "description": "Minimalist 2D vector scene on a deep slate background (#1A1E29); a clean, calm cartoon figure stands composed in the light, while behind them their elongated dark silhouette looms massive on the wall, holding glowing puppeteer strings that control two opposing arguing characters, bold purple and cyan glow accents, no text."
+      },
+      {
+        "id": "the_cracked_social_mask",
+        "name": "The Mask Of Composure",
+        "description": "Striking side-profile close-up of a stylish cartoon face split down the middle: one half is a smooth smiling white porcelain mask, while the other half reveals an intricate, glowing neon clockwork brain with intense electric violet sparks and calculated focus, high chromatic tension, no text."
+      },
+      {
+        "id": "the_unseen_chess_move",
+        "name": "The Invisible Pawn Gambit",
+        "description": "Overhead minimalist perspective of a giant glossy dark chessboard; a small, confident cartoon character casually pushes a single glowing neon blue pawn forward, while across the board a towering, arrogant crowned king figure begins to shatter into geometric dust, no text."
+      }
+    ],
+    "offline_voice": "Michael·  American Male",
+    "elevenlabs_voice": "Jeremy - Young, Confident, American Male  ·  ElevenLabs (Male)",
+    "voices": {
+      "offline": "Michael·  American Male",
+      "elevenlabs": "Jeremy - Young, Confident, American Male  ·  ElevenLabs (Male)"
+    }
+  }
+}

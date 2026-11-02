@@ -203,13 +203,22 @@ class Database:
 
     def load_pending_jobs(self) -> list[Job]:
         with self._cursor() as cur:
+            # Recover any jobs that were interrupted in 'running' state back to 'pending'
+            cur.execute("UPDATE jobs SET state = 'pending' WHERE state = 'running'")
+            cur.execute("UPDATE projects SET status = 'queued' WHERE status = 'processing'")
             cur.execute("""
                 SELECT data_json FROM jobs
                 WHERE state IN ('pending', 'retrying')
                 ORDER BY priority DESC, queued_at ASC
             """)
             rows = cur.fetchall()
-        return [Job.from_dict(json.loads(r["data_json"])) for r in rows]
+        jobs = []
+        for r in rows:
+            job_dict = json.loads(r["data_json"])
+            if job_dict.get("state") == "running":
+                job_dict["state"] = "pending"
+            jobs.append(Job.from_dict(job_dict))
+        return jobs
 
     def load_all_jobs(self) -> list[Job]:
         with self._cursor() as cur:

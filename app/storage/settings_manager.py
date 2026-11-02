@@ -5,6 +5,7 @@ Supports presets (named render profiles) and global preferences.
 
 import json
 import os
+import sys
 import logging
 from pathlib import Path
 from typing import Optional, Any
@@ -62,14 +63,15 @@ DEFAULT_SETTINGS = {
     "preferred_script_keywords": "script,transcript,narration,text",
 
     # Subtitle style defaults
+    "sub_enabled": True,
     "sub_font": "Arial",
-    "sub_font_size": 72,
+    "sub_font_size": 44,
     "sub_bold": True,
     "sub_primary_color": "#FFFFFF",    # hex color
     "sub_outline_color": "#000000",
-    "sub_outline_width": 3.0,
-    "sub_shadow": 1.5,
-    "sub_margin_v": 80,
+    "sub_outline_width": 2.2,
+    "sub_shadow": 1.2,
+    "sub_margin_v": 60,
     "sub_mode": "phrase",              # phrase / classic / viral / word / karaoke
     "sub_max_chars": 42,
     "sub_position": "bottom_center",   # bottom_center / bottom_left / center
@@ -94,6 +96,14 @@ class SettingsManager:
 
     # ─── Core Settings ────────────────────────────────────────────────────────
 
+    def reload_master_presets(self):
+        """Force reload all presets defined in master_presets_registry.json."""
+        registry_presets = self._default_presets()
+        for k, v in registry_presets.items():
+            if k not in ["Fast Preview (720p)", "High Quality Archive"]:
+                self._presets[k] = v
+        self.save()
+
     def load(self):
         """Load settings from disk, filling missing keys with defaults."""
         self._data = deepcopy(DEFAULT_SETTINGS)
@@ -106,7 +116,24 @@ class SettingsManager:
                     self._deep_update(self._data, raw.get("settings", {}))
                     saved_presets = raw.get("presets", {})
                     if saved_presets:
-                        self._presets = saved_presets
+                        for name, p_dict in saved_presets.items():
+                            if name in self._presets:
+                                # For master registry presets, sync typography & ASS styling from registry defaults
+                                sync_keys = [
+                                    "subtitle_font", "subtitle_font_size", "subtitle_bold",
+                                    "subtitle_italic", "subtitle_spacing", "subtitle_uppercase",
+                                    "subtitle_animation", "subtitle_primary_color",
+                                    "subtitle_karaoke_color", "subtitle_karaoke_outline",
+                                    "subtitle_outline_color", "subtitle_back_color",
+                                    "subtitle_outline_width", "subtitle_shadow",
+                                    "subtitle_border_style", "subtitle_margin_v",
+                                    "subtitle_alignment", "allowed_transitions", "subtitle_mode",
+                                    "subtitle_max_chars"
+                                ]
+                                for sub_key in sync_keys:
+                                    if sub_key in self._presets[name] and sub_key not in p_dict:
+                                        p_dict[sub_key] = self._presets[name][sub_key]
+                            self._presets[name] = p_dict
                 log.debug(f"Settings loaded from {self.settings_path}")
             except Exception as e:
                 log.error(f"Failed to load settings, using defaults: {e}")
@@ -142,7 +169,10 @@ class SettingsManager:
 
     def get_default_profile(self) -> RenderProfile:
         try:
-            return RenderProfile.from_dict(self._data.get("default_profile", {}))
+            profile = RenderProfile.from_dict(self._data.get("default_profile", {}))
+            if "sub_enabled" in self._data:
+                profile.subtitle_enabled = bool(self._data["sub_enabled"])
+            return profile
         except Exception:
             return RenderProfile()
 
@@ -277,8 +307,8 @@ class SettingsManager:
         # Try load master registry
         try:
             import json
-            registry_path = Path("H:/Automation/Presets/master_presets_registry.json")
-            if registry_path.exists():
+            registry_path = get_master_presets_registry_path()
+            if registry_path and registry_path.is_file():
                 data = json.loads(registry_path.read_text(encoding="utf-8"))
                 for slug, item in data.items():
                     vf = item.get("video_forge", {})
@@ -292,13 +322,24 @@ class SettingsManager:
                     
                     # Mappings from master registry
                     transitions_list = vf.get("allowed_transitions", [])
-                    p.transition_type = TransitionType.FADE # default
-                    if "cut" in transitions_list and len(transitions_list) == 1:
-                        p.transition_type = TransitionType.CUT
-                    elif "dissolve" in transitions_list:
-                        p.transition_type = TransitionType.DISSOLVE
+                    p.allowed_transitions = transitions_list if transitions_list else ["fade", "dissolve"]
+                    p.transition_type = TransitionType.FADE
+                    if transitions_list:
+                        first_t = transitions_list[0].lower()
+                        try:
+                            p.transition_type = TransitionType(first_t)
+                        except Exception:
+                            p.transition_type = TransitionType.FADE
 
-                    sub_mode = vf.get("sub_mode", "phrase")
+                    p.transition_duration = float(vf.get("transition_duration", 0.6) or 0.6)
+                    m_type_str = vf.get("motion_type", "ken_burns")
+                    try:
+                        p.motion_type = MotionType(str(m_type_str).lower())
+                    except Exception:
+                        p.motion_type = MotionType.KEN_BURNS
+                    p.motion_intensity = float(vf.get("motion_intensity", 1.0) or 1.0)
+
+                    sub_mode = vf.get("sub_mode", "karaoke").lower()
                     if sub_mode == "phrase":
                         p.subtitle_mode = SubtitleMode.PHRASE
                     elif sub_mode == "viral":
@@ -308,14 +349,34 @@ class SettingsManager:
                     else:
                         p.subtitle_mode = SubtitleMode.CLASSIC
                         
-                    p.subtitle_font = vf.get("subtitle_font", "Arial-Bold")
+                    p.subtitle_enabled = True
+                    p.subtitle_font = vf.get("subtitle_font", "Arial")
+                    p.subtitle_font_size = int(vf.get("subtitle_font_size", 54))
+                    p.subtitle_bold = bool(vf.get("subtitle_bold", True))
+                    p.subtitle_italic = bool(vf.get("subtitle_italic", False))
+                    p.subtitle_spacing = float(vf.get("subtitle_spacing", 0.0))
+                    p.subtitle_uppercase = bool(vf.get("subtitle_uppercase", False))
+                    p.subtitle_animation = vf.get("subtitle_animation", "pop")
                     p.subtitle_primary_color = vf.get("subtitle_primary_color", "&H00FFFFFF")
+                    p.subtitle_karaoke_color = vf.get("subtitle_karaoke_color", "&H0000FFFF")
+                    p.subtitle_karaoke_outline = vf.get("subtitle_karaoke_outline", "")
                     p.subtitle_outline_color = vf.get("subtitle_outline_color", "&H00000000")
+                    p.subtitle_back_color = vf.get("subtitle_back_color", "&H80000000")
+                    p.subtitle_outline_width = float(vf.get("subtitle_outline_width", 3.0))
+                    p.subtitle_shadow = float(vf.get("subtitle_shadow", 2.0))
+                    p.subtitle_border_style = int(vf.get("subtitle_border_style", 1))
+                    p.subtitle_max_chars = int(vf.get("subtitle_max_chars", 36))
                     
-                    if vf.get("sub_position") == "bottom_center":
-                        p.subtitle_margin_v = 80
-                    elif vf.get("sub_position") == "center":
-                        p.subtitle_margin_v = 500
+                    sub_pos = vf.get("sub_position", "bottom_center")
+                    if sub_pos == "bottom_center":
+                        p.subtitle_margin_v = int(vf.get("subtitle_margin_v", 80))
+                        p.subtitle_alignment = 2
+                    elif sub_pos == "center":
+                        p.subtitle_margin_v = int(vf.get("subtitle_margin_v", 500))
+                        p.subtitle_alignment = 5
+                    else:
+                        p.subtitle_margin_v = int(vf.get("subtitle_margin_v", 80))
+                        p.subtitle_alignment = 2
                         
                     presets[slug] = p.to_dict()
         except Exception as e:
@@ -324,10 +385,51 @@ class SettingsManager:
         return presets
 
 
+def get_master_presets_registry_path() -> Optional[Path]:
+    """
+    Locates the master presets registry file across candidate locations.
+    Checks environment variable, repo-bundled directory, parent presets directory,
+    and legacy paths.
+    """
+    env_path = os.environ.get("MASTER_PRESETS_REGISTRY_PATH") or os.environ.get("VIDEOFORGE_PRESETS_REGISTRY")
+    candidates = []
+    if env_path:
+        candidates.append(Path(env_path))
+
+    repo_root = Path(__file__).resolve().parents[2]
+    candidates.extend([
+        repo_root / "presets" / "master_presets_registry.json",
+        repo_root / "profiles" / "master_presets_registry.json",
+        Path.cwd() / "presets" / "master_presets_registry.json",
+        Path.cwd() / "profiles" / "master_presets_registry.json",
+        repo_root.parent / "Presets" / "master_presets_registry.json",
+        Path.cwd().parent / "Presets" / "master_presets_registry.json",
+    ])
+    for cand in candidates:
+        if cand.is_file():
+            return cand
+    return None
+
+
 def get_app_data_dir() -> Path:
-    """Return platform-appropriate app data directory."""
+    """Return platform-appropriate app data directory, supporting env overrides."""
+    env_dir = os.environ.get("VIDEOFORGE_DATA_DIR") or os.environ.get("VIDEOFORGE_HOME")
+    if env_dir:
+        p = Path(env_dir)
+        p.mkdir(parents=True, exist_ok=True)
+        return p
+
     if os.name == "nt":  # Windows
         base = os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming")
-        return Path(base) / "VideoForge"
-    else:
-        return Path.home() / ".videoforge"
+        app_dir = Path(base) / "VideoForge"
+    elif sys.platform == "darwin":  # macOS
+        app_dir = Path.home() / "Library" / "Application Support" / "VideoForge"
+    else:  # Linux / Unix
+        xdg_data = os.environ.get("XDG_DATA_HOME")
+        if xdg_data:
+            app_dir = Path(xdg_data) / "videoforge"
+        else:
+            app_dir = Path.home() / ".local" / "share" / "videoforge"
+
+    app_dir.mkdir(parents=True, exist_ok=True)
+    return app_dir
