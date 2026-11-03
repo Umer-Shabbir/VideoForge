@@ -31,21 +31,38 @@ def find_ffmpeg(custom_path: Optional[str] = None) -> Optional[str]:
     env_path = os.environ.get("FFMPEG_PATH")
     if env_path:
         candidates.append(env_path)
-    app_dir = Path(__file__).parent.parent.parent
-    candidates += [
-        str(app_dir / "ffmpeg" / "ffmpeg.exe"),
-        str(app_dir / "ffmpeg.exe"),
-        str(app_dir / "bin" / "ffmpeg.exe"),
-    ]
     from_path = shutil.which("ffmpeg")
     if from_path:
         candidates.append(from_path)
+
+    app_dir = Path(__file__).parent.parent.parent
     candidates += [
-        r"C:\ffmpeg\bin\ffmpeg.exe",
-        r"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
-        os.path.expanduser(r"~\ffmpeg\bin\ffmpeg.exe"),
-        os.path.expanduser(r"~\AppData\Local\ffmpeg\bin\ffmpeg.exe"),
+        str(app_dir / "ffmpeg" / "ffmpeg.exe"),
+        str(app_dir / "ffmpeg" / "ffmpeg"),
+        str(app_dir / "ffmpeg.exe"),
+        str(app_dir / "ffmpeg"),
+        str(app_dir / "bin" / "ffmpeg.exe"),
+        str(app_dir / "bin" / "ffmpeg"),
     ]
+
+    if os.name == "nt":
+        sys_drive = os.environ.get("SystemDrive", "C:")
+        prog_files = os.environ.get("ProgramFiles", rf"{sys_drive}\Program Files")
+        candidates += [
+            rf"{sys_drive}\ffmpeg\bin\ffmpeg.exe",
+            rf"{prog_files}\ffmpeg\bin\ffmpeg.exe",
+            os.path.expanduser(r"~\ffmpeg\bin\ffmpeg.exe"),
+            os.path.expanduser(r"~\AppData\Local\ffmpeg\bin\ffmpeg.exe"),
+        ]
+    else:
+        candidates += [
+            "/usr/bin/ffmpeg",
+            "/usr/local/bin/ffmpeg",
+            "/opt/homebrew/bin/ffmpeg",
+            os.path.expanduser("~/bin/ffmpeg"),
+            os.path.expanduser("~/.local/bin/ffmpeg"),
+        ]
+
     for c in candidates:
         p = Path(c)
         if p.is_file():
@@ -60,6 +77,10 @@ def find_ffprobe(custom_path: Optional[str] = None) -> Optional[str]:
     global _ffprobe_path
     if _ffprobe_path:
         return _ffprobe_path
+    env_path = os.environ.get("FFPROBE_PATH")
+    if env_path and Path(env_path).is_file():
+        _ffprobe_path = env_path
+        return _ffprobe_path
     ffmpeg = find_ffmpeg(custom_path)
     if ffmpeg:
         for name in ("ffprobe.exe", "ffprobe"):
@@ -71,6 +92,17 @@ def find_ffprobe(custom_path: Optional[str] = None) -> Optional[str]:
     if from_path:
         _ffprobe_path = from_path
         return _ffprobe_path
+    if os.name != "nt":
+        for loc in (
+            "/usr/bin/ffprobe",
+            "/usr/local/bin/ffprobe",
+            "/opt/homebrew/bin/ffprobe",
+            os.path.expanduser("~/bin/ffprobe"),
+            os.path.expanduser("~/.local/bin/ffprobe"),
+        ):
+            if Path(loc).is_file():
+                _ffprobe_path = loc
+                return _ffprobe_path
     return None
 
 
@@ -190,6 +222,7 @@ def run_ffmpeg(
     timeout: Optional[int] = None,
     progress_callback=None,
     log_callback=None,
+    expected_duration: Optional[float] = None,
 ) -> tuple:
     """
     Run an FFmpeg command, capturing all output.
@@ -206,59 +239,21 @@ def run_ffmpeg(
     if cmd[0] == "ffmpeg":
         cmd[0] = ffmpeg_bin
 
-    # ── Windows command-line length guard ─────────────────────────────────────
-    # Windows CreateProcess limit: ~32767 chars total.
-    # With 104 inputs, the -i arguments alone are ~8000 chars.
-    # The filter_complex content adds ~20000 more → total exceeds the limit.
-    # Solution: write filter_complex to a file next to the output, pass via
-    # -filter_complex_script. The file path itself must be short and ASCII.
-    #
-    # IMPORTANT: -filter_complex_script is INCOMPATIBLE with -vf on the same
-    # output. Make sure subtitle filters are inside filter_complex, not -vf.
-    _temp_fc_file = None
-    if "-filter_complex" in cmd:
-        fc_idx = cmd.index("-filter_complex")
-        fc_content = str(cmd[fc_idx + 1])
-        # Calculate total command line length FFmpeg would see
-        cmd_len = sum(len(str(a)) for a in cmd)
-        if cmd_len > 25000 or len(fc_content) > 15000:
-            # Write filter_complex next to the output file for a clean path
-            output_arg = str(cmd[-1])
-            import pathlib as _pl
-            fc_dir = _pl.Path(output_arg).parent
-            fc_dir.mkdir(parents=True, exist_ok=True)
-            fc_file = fc_dir / "_filter_complex.txt"
-            try:
-                fc_file.write_text(fc_content, encoding="utf-8")
-                _temp_fc_file = str(fc_file)
-                cmd[fc_idx]     = "-filter_complex_script"
-                cmd[fc_idx + 1] = _temp_fc_file
-                log.info(
-                    f"filter_complex ({len(fc_content):,} chars) → "
-                    f"script file: {_temp_fc_file}"
-                )
-            except Exception as e:
-                log.warning(f"Could not write filter_complex_script file: {e}. "
-                            f"Using -filter_complex directly (may fail on long commands).")
+    if "-nostdin" not in cmd:
+        cmd.insert(1, "-nostdin")
 
-    # Always log full command at INFO so it appears in the Logs panel
+    # ── Command logging ───────────────────────────────────────────────────────
     cmd_str = " ".join(str(a) for a in cmd)
     log.info(f"FFmpeg command: {cmd_str}")
 
-    if _temp_fc_file:
-        try:
-            fc_preview = open(_temp_fc_file, encoding="utf-8").read()
-            log.debug(f"filter_complex_script content (first 1000 chars):\n{fc_preview[:1000]}")
-        except Exception:
-            pass
-
     stderr_lines = []
-    stdout_lines = []
-    duration_total = None
+    stdout_chunks = []
+    duration_total = expected_duration if (expected_duration and expected_duration > 0) else None
 
     try:
         process = subprocess.Popen(
             cmd,
+            stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -267,6 +262,14 @@ def run_ffmpeg(
             cwd=cwd,
             creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
         )
+
+        def _read_stdout():
+            try:
+                if process.stdout:
+                    for line in process.stdout:
+                        stdout_chunks.append(line)
+            except (ValueError, OSError):
+                pass
 
         def _read_stderr():
             nonlocal duration_total
@@ -294,23 +297,25 @@ def run_ffmpeg(
             except (ValueError, OSError):
                 pass
 
-        t = threading.Thread(target=_read_stderr, daemon=True)
-        t.start()
+        t_err = threading.Thread(target=_read_stderr, daemon=True)
+        t_out = threading.Thread(target=_read_stdout, daemon=True)
+        t_err.start()
+        t_out.start()
 
         try:
-            stdout_data, _ = process.communicate(timeout=timeout)
+            process.wait(timeout=timeout)
         except subprocess.TimeoutExpired:
             process.kill()
-            process.communicate()
-            t.join(timeout=3)
-            _del_temp(_temp_fc_file)
+            t_err.join(timeout=3)
+            t_out.join(timeout=3)
             return -2, "", "FFmpeg process timed out"
 
-        t.join(timeout=8)
+        t_err.join(timeout=8)
+        t_out.join(timeout=8)
 
         rc = process.returncode
         full_stderr = "\n".join(stderr_lines)
-        full_stdout = (stdout_data or "")
+        full_stdout = "".join(stdout_chunks)
 
         # Always log full stderr at debug level
         if full_stderr:
@@ -324,11 +329,9 @@ def run_ffmpeg(
                 f"Full stderr:\n{full_stderr}"
             )
 
-        _del_temp(_temp_fc_file)
         return rc, full_stdout, full_stderr
 
     except Exception as e:
-        _del_temp(_temp_fc_file)
         log.error(f"FFmpeg Popen failed: {e}")
         return -3, "", str(e)
 

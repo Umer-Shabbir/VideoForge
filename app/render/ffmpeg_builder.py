@@ -10,6 +10,7 @@ from typing import Optional
 
 from app.core.project import Project, RenderProfile, FitMode, TransitionType, MotionType
 from app.render.timeline import ImageSlot, build_zoompan_filter
+from app.render.effects import sanitize_transition_name, clamp_transition_duration
 
 log = logging.getLogger("videoforge.ffmpeg_builder")
 
@@ -176,8 +177,8 @@ def build_render_command(
     cmd.extend(["-map", f"[{final_video_label}]"])
     cmd.extend(["-map", f"[{audio_out_label}]"])
 
-    # ── Subtitle burn-in ──────────────────────────────────────────────────────
-    if subtitle_path and subtitle_path.exists() and profile.subtitle_enabled:
+    from app.core.project import SubtitleMode
+    if subtitle_path and subtitle_path.exists() and (profile.subtitle_enabled or profile.subtitle_mode == SubtitleMode.KARAOKE):
         # ASS subtitles are burned in as a video filter
         # We need to add it AFTER the main filter_complex via -vf
         # FFmpeg requires ASS path with forward slashes and escaped colons on Windows
@@ -188,7 +189,7 @@ def build_render_command(
     cmd.extend([
         "-c:v", profile.video_codec,
         "-crf", str(profile.crf),
-        "-preset", profile.preset_name,
+        "-preset", profile.get_x264_preset(default="fast"),
         "-b:v", profile.video_bitrate,
         "-maxrate", _scale_bitrate(profile.video_bitrate, 1.5),
         "-bufsize", _scale_bitrate(profile.video_bitrate, 2),
@@ -276,6 +277,11 @@ def _build_xfade_chain(
     if len(labels) == 1:
         return labels[0]
 
+    if trans_type == "none" or trans_dur <= 0:
+        inputs = "".join(f"[{lbl}]" for lbl in labels)
+        filter_parts.append(f"{inputs}concat=n={len(labels)}:v=1:a=0[vfinal]")
+        return "vfinal"
+
     # Calculate xfade offsets
     # The offset is the time in the concatenated stream when the transition starts
     cumulative = 0.0
@@ -285,22 +291,25 @@ def _build_xfade_chain(
         # Get the display duration of the previous slot
         if i - 1 < len(slots):
             prev_display = slots[i - 1].display_duration
+            cur_display = slots[i].display_duration if i < len(slots) else prev_display
+            raw_trans = getattr(slots[i - 1], "transition_out", trans_type)
         else:
-            # Intro/outro: use profile transition duration
             prev_display = trans_dur * 2
+            cur_display = trans_dur * 2
+            raw_trans = trans_type
+
+        safe_trans = sanitize_transition_name(raw_trans, default=trans_type)
+        t_dur = clamp_transition_duration(prev_display, cur_display, base_duration=trans_dur)
 
         cumulative += prev_display
-        offset = max(0.01, cumulative - trans_dur)
+        offset = max(0.01, cumulative)
 
         out_label = f"xf{i}" if i < len(labels) - 1 else "vfinal"
-
-        # Clamp transition type for safety
-        safe_trans = trans_type if trans_type != "none" else "fade"
 
         xfade = (
             f"[{prev_label}][{labels[i]}]"
             f"xfade=transition={safe_trans}:"
-            f"duration={trans_dur:.3f}:"
+            f"duration={t_dur:.3f}:"
             f"offset={offset:.3f}"
             f"[{out_label}]"
         )

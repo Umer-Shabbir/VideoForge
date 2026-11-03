@@ -1,4 +1,4 @@
-﻿"""
+"""
 Dashboard panel: shows overview stats, quick-action buttons, and recent activity.
 """
 
