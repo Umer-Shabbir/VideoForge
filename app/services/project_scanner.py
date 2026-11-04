@@ -1,4 +1,4 @@
-﻿"""
+"""
 Project scanner service: takes a folder path, finds valid project folders,
 and creates Project objects with detected files and metadata.
 """
@@ -14,6 +14,100 @@ from app.utils.ffmpeg_utils import get_audio_duration
 from app.validators.project_validator import validate_project
 
 log = logging.getLogger("videoforge.scanner")
+
+
+def sync_project_preset_styling(project: Project, settings_manager=None) -> bool:
+    """
+    Ensure the project's profile has the proper typography & subtitle styling
+    defined for its preset (from settings or master registry).
+    Returns True if styling was updated, False otherwise.
+    """
+    if not project:
+        return False
+
+    preset_name = getattr(project, "preset_name", "") or ""
+
+    # If preset is empty or Default, check folder for project.json or metadata.json
+    if not preset_name or preset_name.lower() == "default":
+        folder = getattr(project, "folder", None)
+        if folder:
+            fpath = Path(folder)
+            meta_file = fpath / "project.json"
+            if not meta_file.exists():
+                meta_file = fpath / "metadata.json"
+            if meta_file.exists():
+                import json
+                try:
+                    meta = json.loads(meta_file.read_text(encoding="utf-8"))
+                    preset_name = meta.get("preset_name", "")
+                    if preset_name:
+                        project.preset_name = preset_name
+                except Exception:
+                    pass
+
+    if not preset_name or preset_name.lower() == "default":
+        return False
+
+    preset_profile = None
+    if settings_manager and hasattr(settings_manager, "get_preset"):
+        preset_profile = settings_manager.get_preset(preset_name)
+
+    if not preset_profile:
+        try:
+            from app.storage.settings_manager import SettingsManager
+            defaults = SettingsManager._default_presets()
+            if preset_name in defaults:
+                preset_profile = RenderProfile.from_dict(defaults[preset_name])
+        except Exception as e:
+            log.debug(f"Could not load default presets: {e}")
+
+    if not preset_profile:
+        return False
+
+    pr = project.profile
+    # Apply typography & ASS subtitle styling from preset
+    pr.subtitle_enabled = True
+    pr.subtitle_font = preset_profile.subtitle_font
+    pr.subtitle_font_size = preset_profile.subtitle_font_size
+    pr.subtitle_bold = preset_profile.subtitle_bold
+    pr.subtitle_italic = preset_profile.subtitle_italic
+    pr.subtitle_spacing = preset_profile.subtitle_spacing
+    pr.subtitle_uppercase = preset_profile.subtitle_uppercase
+    pr.subtitle_animation = preset_profile.subtitle_animation
+    pr.subtitle_primary_color = preset_profile.subtitle_primary_color
+    pr.subtitle_karaoke_color = preset_profile.subtitle_karaoke_color
+    pr.subtitle_karaoke_outline = preset_profile.subtitle_karaoke_outline
+    pr.subtitle_outline_color = preset_profile.subtitle_outline_color
+    pr.subtitle_back_color = preset_profile.subtitle_back_color
+    pr.subtitle_outline_width = preset_profile.subtitle_outline_width
+    pr.subtitle_shadow = preset_profile.subtitle_shadow
+    pr.subtitle_border_style = preset_profile.subtitle_border_style
+    pr.subtitle_margin_v = preset_profile.subtitle_margin_v
+    pr.subtitle_alignment = preset_profile.subtitle_alignment
+    pr.subtitle_mode = preset_profile.subtitle_mode
+    pr.subtitle_max_chars = preset_profile.subtitle_max_chars
+
+    if preset_profile.allowed_transitions:
+        pr.allowed_transitions = list(preset_profile.allowed_transitions)
+    if preset_profile.transition_type:
+        pr.transition_type = preset_profile.transition_type
+
+    # Ensure transition duration is positive so transition effects are active
+    dur = getattr(preset_profile, "transition_duration", 0.0) or 0.0
+    pr.transition_duration = float(dur) if dur > 0 else 0.6
+
+    # Ensure motion type and intensity are active
+    mt = getattr(preset_profile, "motion_type", None)
+    if not mt or str(mt).lower() in ("none", "static"):
+        from app.core.project import MotionType
+        pr.motion_type = MotionType.KEN_BURNS
+    else:
+        pr.motion_type = mt
+
+    mi = getattr(preset_profile, "motion_intensity", 1.0) or 1.0
+    pr.motion_intensity = float(mi) if mi > 0 else 1.0
+
+    return True
 
 
 class ProjectScanner:
@@ -140,38 +234,47 @@ class ProjectScanner:
             name=folder.name,
         )
 
-        # Check for metadata.json to resolve matching preset
+        # Resolve preset and styling
+        project.profile = RenderProfile.from_dict(self.default_profile.to_dict())
         meta_file = folder / "project.json"
         if not meta_file.exists():
             meta_file = folder / "metadata.json"
-        resolved_preset_name = ""
         if meta_file.exists():
             import json
             try:
                 meta = json.loads(meta_file.read_text(encoding="utf-8"))
-                resolved_preset_name = meta.get("preset_name", "")
+                project.preset_name = meta.get("preset_name", "")
             except Exception:
                 pass
 
-        # Try to apply matching preset from settings if available
-        preset_profile = None
-        if resolved_preset_name and self.settings_manager:
-            preset_profile = self.settings_manager.get_preset(resolved_preset_name)
-            if preset_profile:
-                log.info(f"Loaded preset '{resolved_preset_name}' for project {folder.name}")
-            else:
-                log.info(f"Preset '{resolved_preset_name}' not found in local presets. Using default preset for {folder.name}.")
-
-        if preset_profile:
-            project.profile = RenderProfile.from_dict(preset_profile.to_dict())
+        synced = sync_project_preset_styling(project, self.settings_manager)
+        if synced:
+            log.info(f"Loaded preset '{project.preset_name}' with subtitle style ({project.profile.subtitle_font} {project.profile.subtitle_font_size}pt) for project {folder.name}")
         else:
-            project.profile = RenderProfile.from_dict(self.default_profile.to_dict())
+            if not project.preset_name:
+                project.preset_name = "Default"
+            log.info(f"Preset '{project.preset_name}' using default profile for {folder.name}.")
+
+        from app.core.project import SubtitleMode
+        if self.settings_manager:
+            if self.settings_manager.get("sub_enabled", True) or project.profile.subtitle_mode == SubtitleMode.KARAOKE:
+                project.profile.subtitle_enabled = True
 
         # Set files
         project.audio_path = detected.get("audio")
         project.bgm_path = detected.get("bgm")
         project.transcript_path = detected.get("transcript")
+        project.prompts_path = detected.get("prompts")
         project.image_paths = detected.get("images", [])
+
+        # Read scene chunks from prompts file if available
+        if project.prompts_path:
+            try:
+                from app.utils.file_utils import parse_prompts_file
+                project.scene_chunks = parse_prompts_file(project.prompts_path)
+                log.info(f"Loaded {len(project.scene_chunks)} scene chunks from {project.prompts_path.name} for {folder.name}")
+            except Exception as e:
+                log.warning(f"Could not parse prompts file for {folder.name}: {e}")
 
         # Get audio duration
         if project.audio_path:
@@ -193,6 +296,15 @@ class ProjectScanner:
                     project.transcript_word_count = len(text.split())
             except Exception as e:
                 log.warning(f"Could not read transcript for {folder.name}: {e}")
+
+        # Ensure chapters.txt is generated if script.txt is present and chapters.txt is missing
+        chapters_file = folder / "chapters.txt"
+        if not chapters_file.exists() and (folder / "script.txt").exists():
+            try:
+                from app.services.chapter_generator import generate_chapters_for_project
+                generate_chapters_for_project(folder, final_duration=project.audio_duration)
+            except Exception as chap_err:
+                log.debug(f"Could not auto-generate chapters for {folder.name} on scan: {chap_err}")
 
         # Run validation
         if self.auto_validate:

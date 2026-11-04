@@ -1,6 +1,4 @@
-from typing import Optional
 from typing import Optional, List
-from app.core.project import RenderProfile, SubtitleMode
 from app.core.project import RenderProfile, SubtitleMode
 
 # Fallback colors for speakers when multi-speaker mode is used
@@ -118,33 +116,48 @@ def _wrap(text: str, max_chars: int) -> str:
     return f"{l1}\\N{l2}"
 
 
-def _hex_to_ass(hex_color: str, alpha: str = "00") -> str:
-    """Convert #RRGGBB to ASS &H<AA><BB><GG><RR> format (style header format)."""
-    h = hex_color.lstrip("#")
-    if len(h) == 6:
-        r, g, b = h[0:2], h[2:4], h[4:6]
+def _hex_to_ass(color_str: str, alpha: str = "00") -> str:
+    """Convert any color representation (#RRGGBB, &HAABBGGRR, etc.) to ASS &HAABBGGRR format."""
+    if not color_str:
+        return f"&H{alpha}FFFFFF"
+    s = color_str.strip()
+    if s.startswith("&H") or s.startswith("&h"):
+        raw = s[2:].rstrip("&")
+        if len(raw) == 8:
+            return f"&H{raw}".upper()
+        if len(raw) == 6:
+            return f"&H{alpha}{raw}".upper()
+        return f"&H{alpha}FFFFFF"
+    if s.startswith("#"):
+        s = s[1:]
+    if len(s) >= 6:
+        r, g, b = s[0:2], s[2:4], s[4:6]
         return f"&H{alpha}{b}{g}{r}".upper()
-    return hex_color if hex_color.startswith("&H") else "&H00FFFFFF"
+    return f"&H{alpha}FFFFFF"
 
 
-def _ass_color_to_bbggrr(ass_color: str) -> str:
+def _ass_color_to_bbggrr(color_str: str) -> str:
     """
-    Extract the BBGGRR hex string from an ASS &HAABBGGRR colour.
+    Extract the BBGGRR hex string from an ASS &HAABBGGRR / &HBBGGRR colour
+    OR a hex #RRGGBB / RRGGBB colour.
     Used for inline override tags: {\\1c&H<BBGGRR>&}
-
-    Examples:
-      "&H0000FFFF"  → "00FFFF"   (yellow)
-      "&H00FFFFFF"  → "FFFFFF"   (white)
-      "&H00FFFFFF&" → "FFFFFF"   (trailing & stripped)
     """
-    h = ass_color.strip()
-    if h.startswith("&H"):
-        h = h[2:]
-    h = h.rstrip("&")
-    if len(h) == 8:
-        return h[2:]    # drop alpha prefix, keep BBGGRR
-    if len(h) == 6:
-        return h
+    if not color_str:
+        return "FFFFFF"
+    s = color_str.strip()
+    if s.startswith("#"):
+        hex_val = s[1:]
+        if len(hex_val) >= 6:
+            r, g, b = hex_val[0:2], hex_val[2:4], hex_val[4:6]
+            return f"{b}{g}{r}".upper()
+        return "FFFFFF"
+    if s.startswith("&H") or s.startswith("&h"):
+        s = s[2:]
+    s = s.rstrip("&")
+    if len(s) == 8:
+        return s[2:8].upper()
+    if len(s) == 6:
+        return s.upper()
     return "FFFFFF"
 
 
@@ -158,47 +171,47 @@ def _make_colour_tag(bbggrr: str) -> str:
 def _style_line(profile: RenderProfile, style_name: str = "Default",
                 is_karaoke: bool = False) -> str:
     """
-    Build one ASS V4+ style line.
-    For karaoke, PrimaryColour = highlight, SecondaryColour = normal text.
-    (These are overridden per-word via inline tags anyway, but setting them
-    correctly ensures a sane fallback if a renderer ignores inline tags.)
+    Build one ASS V4+ style line with full support for preset-specific typography,
+    colors, outlines, shadow, borders, and margins.
     """
-    mode = profile.subtitle_mode
-    base_size = max(32, min(profile.subtitle_font_size, 120))
+    base_size = max(24, min(profile.subtitle_font_size, 96))
+    mode = getattr(profile, "subtitle_mode", SubtitleMode.KARAOKE)
 
-    if mode in (SubtitleMode.VIRAL, SubtitleMode.WORD, SubtitleMode.KARAOKE):
-        font_size  = int(base_size * 1.15)
-        margin_v   = max(120, profile.subtitle_margin_v)
-        outline_w  = 4.0
-        shadow     = 2.0
+    if mode in (SubtitleMode.VIRAL, SubtitleMode.WORD):
+        font_size  = int(base_size * 1.05)
     else:
         font_size  = base_size
-        margin_v   = profile.subtitle_margin_v
-        outline_w  = profile.subtitle_outline_width
-        shadow     = profile.subtitle_shadow
 
-    bold  = "-1" if profile.subtitle_bold else "0"
-    font  = profile.subtitle_font or "Arial"
+    margin_v   = profile.subtitle_margin_v
+    outline_w  = getattr(profile, "subtitle_outline_width", 2.6)
+    shadow     = getattr(profile, "subtitle_shadow", 1.5)
+
+    bold    = "-1" if profile.subtitle_bold else "0"
+    italic  = "-1" if getattr(profile, "subtitle_italic", False) else "0"
+    spacing = getattr(profile, "subtitle_spacing", 0.0)
+    font    = profile.subtitle_font or "Arial"
 
     if is_karaoke:
-        primary   = profile.subtitle_karaoke_color
-        secondary = profile.subtitle_primary_color
+        primary   = _hex_to_ass(profile.subtitle_karaoke_color)
+        secondary = _hex_to_ass(profile.subtitle_primary_color)
     else:
-        primary   = profile.subtitle_primary_color
-        secondary = profile.subtitle_primary_color
+        primary   = _hex_to_ass(profile.subtitle_primary_color)
+        secondary = _hex_to_ass(profile.subtitle_primary_color)
 
-    outline = profile.subtitle_outline_color
-    back    = "&H80000000"
+    outline = _hex_to_ass(profile.subtitle_outline_color)
+    back    = _hex_to_ass(getattr(profile, "subtitle_back_color", "&H80000000"), alpha="80")
+    border_style = getattr(profile, "subtitle_border_style", 1)
+    alignment = getattr(profile, "subtitle_alignment", 2)
 
     return (
         f"Style: {style_name},"
         f"{font},{font_size},"
         f"{primary},{secondary},{outline},{back},"
-        f"{bold},0,0,0,"
-        f"100,100,0,0,"
-        f"1,"
+        f"{bold},{italic},0,0,"
+        f"100,100,{spacing:.1f},0,"
+        f"{border_style},"
         f"{outline_w:.1f},{shadow:.1f},"
-        f"2,"
+        f"{alignment},"
         f"10,10,{margin_v},"
         f"1"
     )
@@ -262,13 +275,16 @@ def _standard_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> lis
     """One Dialogue line per chunk — simple, reliable."""
     events = []
     max_chars = profile.subtitle_max_chars
+    uppercase = getattr(profile, "subtitle_uppercase", False)
     for chunk in chunks:
         if chunk.start is None or chunk.end is None or chunk.end <= chunk.start:
             continue
-        text = _wrap(_esc(chunk.text), max_chars)
+        text_raw = chunk.text.upper() if uppercase else chunk.text
+        text = _wrap(_esc(text_raw), max_chars)
         if chunk.speaker:
+            spk = chunk.speaker.upper() if uppercase else chunk.speaker
             spk_color = _ass_color_to_bbggrr(_get_speaker_color(chunk.speaker, profile))
-            text = f"{{\\1c&H{spk_color}&}}\\b1{chunk.speaker}:\\b0 {text}"
+            text = f"{{\\1c&H{spk_color}&}}\\b1{spk}:\\b0 {text}"
         events.append(
             f"Dialogue: 0,{_ass_time(chunk.start)},{_ass_time(chunk.end)},"
             f"Default,,0,0,0,,{text}"
@@ -282,6 +298,8 @@ def _get_speaker_colors(speaker: Optional[str], profile: RenderProfile, assigned
     """Return (normal_bbggrr, highlight_bbggrr) for a speaker."""
     base_normal = _ass_color_to_bbggrr(profile.subtitle_primary_color)
     base_highlight = _ass_color_to_bbggrr(profile.subtitle_karaoke_color)
+    if base_highlight == base_normal:
+        base_highlight = "00FFFF" if base_normal != "00FFFF" else "00A5FF"
 
     if not speaker:
         return base_normal, base_highlight
@@ -318,11 +336,17 @@ def _karaoke_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> list
     events = []
 
     assigned_colors = {}
+    uppercase = getattr(profile, "subtitle_uppercase", False)
     base_normal = _ass_color_to_bbggrr(profile.subtitle_primary_color)
     base_highlight = _ass_color_to_bbggrr(profile.subtitle_karaoke_color)
 
+    # Outline overrides if karaoke highlight has custom outline
+    normal_out_bbggrr = _ass_color_to_bbggrr(profile.subtitle_outline_color)
+    kar_out = getattr(profile, "subtitle_karaoke_outline", None)
+    kar_out_bbggrr = _ass_color_to_bbggrr(kar_out) if (kar_out and kar_out != "&H00000000" and kar_out != profile.subtitle_outline_color) else ""
+
     log.debug(
-        f"Karaoke base: normal=&H{base_normal} highlight=&H{base_highlight}"
+        f"Karaoke base: normal=&H{base_normal} highlight=&H{base_highlight} uppercase={uppercase}"
     )
 
     for chunk in chunks:
@@ -335,6 +359,8 @@ def _karaoke_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> list
         words = chunk.words if chunk.words else chunk.text.split()
         if not words:
             continue
+        if uppercase:
+            words = [w.upper() for w in words]
 
         n = len(words)
 
@@ -380,10 +406,15 @@ def _karaoke_events(chunks: list[SubtitleChunk], profile: RenderProfile) -> list
             chunk_normal, chunk_highlight = _get_speaker_colors(chunk.speaker, profile, assigned_colors)
             normal_tag = _make_colour_tag(chunk_normal)
             highlight_tag = _make_colour_tag(chunk_highlight)
+            if kar_out_bbggrr:
+                highlight_tag += f"{{\\3c&H{kar_out_bbggrr}&}}"
+                normal_tag += f"{{\\3c&H{normal_out_bbggrr}&}}"
 
-            line_text = _build_karaoke_line(esc_words, i, normal_tag, highlight_tag)
+            anim = getattr(profile, "subtitle_animation", "none") or "none"
+            line_text = _build_karaoke_line(esc_words, i, normal_tag, highlight_tag, animation=anim)
             if chunk.speaker:
-                speaker_label = f"{{\\1c&H{chunk_normal}&}}\\b1{chunk.speaker}:\\b0 "
+                spk = chunk.speaker.upper() if uppercase else chunk.speaker
+                speaker_label = f"{{\\1c&H{chunk_normal}&}}\\b1{spk}:\\b0 "
                 line_text = speaker_label + line_text
 
             events.append(
@@ -399,9 +430,11 @@ def _build_karaoke_line(
     active_idx: int,
     normal_tag: str,
     highlight_tag: str,
+    animation: str = "none",
 ) -> str:
     """
-    Build the full-line ASS text for a karaoke word-highlight frame.
+    Build the full-line ASS text for a karaoke word-highlight frame with optional
+    kinetic animation (pop, bounce, glow, box).
 
     Critical: spaces between words must be inside a colour tag to prevent them
     from inheriting the style's PrimaryColour (= highlight colour in karaoke
@@ -409,24 +442,36 @@ def _build_karaoke_line(
 
     Strategy:
     - Normal (inactive) words: include trailing space INSIDE the normal-colour span.
-    - Active (highlighted) word: the word is in highlight colour, but the trailing
+    - Active (highlighted) word: the word is in highlight colour (+ animation), but the trailing
       space is explicitly put in normal colour so it does not appear highlighted.
-
-      {\\1c&Hnormal&}The  {\\1c&Hyellow&}quick{\\1c&Hnormal&}  {\\1c&Hnormal&}brown  {\\1c&Hnormal&}fox
-                       ^^                      ^^^^^^^^^^^^^^^^^^^^             ^^
-                  normal space           space forced to normal colour      normal space
     """
     n = len(esc_words)
     parts = []
+    anim_tag = ""
+    anim_close = ""
+    anim_lower = str(animation).lower() if animation else "none"
+    if anim_lower == "pop":
+        anim_tag = r"{\fscx118\fscy118\t(0,90,\fscx100\fscy100)}"
+        anim_close = r"{\fscx100\fscy100}"
+    elif anim_lower == "bounce":
+        anim_tag = r"{\fscy125\t(0,60,\fscy90)\t(60,120,\fscy100)}"
+        anim_close = r"{\fscy100}"
+    elif anim_lower == "glow":
+        anim_tag = r"{\bord4.5\t(0,100,\bord2.8)}"
+        anim_close = r"{\bord2.8}"
+    elif anim_lower == "box":
+        anim_tag = r"{\fscx112\fscy112\t(0,80,\fscx100\fscy100)}"
+        anim_close = r"{\fscx100\fscy100}"
+
     for j, w in enumerate(esc_words):
         is_active = (j == active_idx)
         is_last = (j == n - 1)
         if is_active:
             if is_last:
-                parts.append(f"{highlight_tag}{w}")
+                parts.append(f"{highlight_tag}{anim_tag}{w}{anim_close}")
             else:
-                # Highlighted word: tag the word in highlight, then force space to normal
-                parts.append(f"{highlight_tag}{w}{normal_tag} ")
+                # Highlighted word: tag the word in highlight + animation, then force space to normal
+                parts.append(f"{highlight_tag}{anim_tag}{w}{anim_close}{normal_tag} ")
         else:
             if is_last:
                 parts.append(f"{normal_tag}{w}")

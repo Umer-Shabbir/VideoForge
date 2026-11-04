@@ -1,4 +1,4 @@
-﻿"""
+"""
 File and path utilities for VideoForge.
 Handles Windows paths, format detection, and folder scanning.
 """
@@ -112,7 +112,7 @@ def detect_project_files(folder: Path,
 
     Returns dict: {audio, bgm, images, transcript, issues}
     """
-    result: dict[str, Any] = {"audio": None, "bgm": None, "images": [], "transcript": None, "issues": []}
+    result: dict[str, Any] = {"audio": None, "bgm": None, "images": [], "transcript": None, "prompts": None, "issues": []}
     issues = cast(list[str], result["issues"])
     if not folder.is_dir():
         issues.append(f"Not a directory: {folder}")
@@ -192,21 +192,28 @@ def detect_project_files(folder: Path,
             return candidates[0]
         # 1) Exact preferred filename match
         if preferred_name:
-            # Check specifically for audio.srt first if requested or general
             for f in candidates:
                 if f.name.lower() == preferred_name.lower():
                     return f
-        # Priority for the unified standard name
+        # Priority for the unified standard name (SRT/VTT first)
         for f in candidates:
-            if f.name.lower() == "audio.srt":
+            if f.name.lower() in ("transcript.srt", "audio.srt", "transcript.vtt", "audio.vtt"):
                 return f
-        # 2) Keyword match
+        # 2) Timed subtitle files (.srt, .vtt) take priority over plain text scripts
+        timed = [f for f in candidates if f.suffix.lower() in (".srt", ".vtt")]
+        if timed:
+            for kw in [k.strip().lower() for k in keywords.split(",") if k.strip()]:
+                for f in timed:
+                    if kw in f.stem.lower():
+                        return f
+            return timed[0]
+        # 3) Keyword match on remaining candidates
         for kw in [k.strip().lower() for k in keywords.split(",") if k.strip()]:
             for f in candidates:
                 if kw in f.stem.lower():
                     return f
-        # 3) Extension priority
-        for ext in [".txt", ".srt", ".json", ".vtt", ".docx", ".md"]:
+        # 4) Extension priority
+        for ext in [".srt", ".vtt", ".txt", ".json", ".docx", ".md"]:
             match = [t for t in candidates if t.suffix.lower() == ext]
             if match:
                 return match[0]
@@ -222,6 +229,14 @@ def detect_project_files(folder: Path,
             )
     else:
         issues.append("No transcript/script file found (subtitles disabled)")
+
+    # ── Scene Prompts selection ───────────────────────────────────────────────
+    prompts_candidates = [
+        f for f in all_files
+        if f.is_file() and f.name.lower() in ("prompts.txt", "prompt.txt", "scene_prompts.txt", "scenes.txt")
+    ]
+    if prompts_candidates:
+        result["prompts"] = prompts_candidates[0]
 
     return result
 
@@ -296,6 +311,283 @@ def _parse_srt_text(path: Path) -> str:
     cleaned = re.sub(r"<[^>]+>", "", cleaned)
     lines = [l.strip() for l in cleaned.splitlines() if l.strip()]
     return " ".join(lines)
+
+
+def parse_srt_segments(path: Path | str) -> list[dict]:
+    """Parse an SRT file into a list of timed segment dicts: [{'start': float, 'end': float, 'text': str}, ...]."""
+    import re
+    try:
+        path = Path(path)
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except Exception as e:
+        log.error(f"Failed to read SRT file {path}: {e}")
+        return []
+    pattern = re.compile(
+        r'(\d+)\s*\n'
+        r'(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,.](\d{3})\s*\n'
+        r'(.*?)(?=\n\s*\n\d+\s*\n|\Z)',
+        re.DOTALL
+    )
+    segs = []
+    for m in pattern.finditer(text):
+        sh, sm, ss, sms = map(int, m.group(2, 3, 4, 5))
+        eh, em, es, ems = map(int, m.group(6, 7, 8, 9))
+        start = sh * 3600 + sm * 60 + ss + sms / 1000.0
+        end = eh * 3600 + em * 60 + es + ems / 1000.0
+        txt = re.sub(r'<[^>]+>', '', m.group(10))
+        txt = ' '.join(txt.strip().split())
+        if txt:
+            segs.append({'start': start, 'end': end, 'text': txt})
+    return segs
+
+
+def parse_prompts_file(path: Path | str) -> list[dict]:
+    """
+    Parse a prompts.txt file into a list of structured scene dicts:
+    [{
+        'scene_number': int,
+        'narration': str,
+        'start_time': Optional[float],
+        'end_time': Optional[float],
+        'start_str': Optional[str],
+        'end_str': Optional[str],
+        'image_prompt': str
+    }, ...]
+    """
+    import re
+    try:
+        path = Path(path)
+        if not path.exists():
+            return []
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except Exception as e:
+        log.error(f"Failed to read prompts file {path}: {e}")
+        return []
+
+    def _parse_time_str(t_str: Optional[str]) -> Optional[float]:
+        if not t_str:
+            return None
+        m = re.match(r'(\d+):(\d+):(\d+)[,.](\d+)', t_str.strip())
+        if m:
+            h, mn, s, ms = m.groups()
+            return int(h) * 3600 + int(mn) * 60 + int(s) + int(ms.ljust(3, '0')[:3]) / 1000.0
+        return None
+
+    # Split by SCENE headers (e.g. --- SCENE 1 --- or === SCENE 1 ===)
+    scene_blocks = re.split(r'(?:^|\n)\s*(?:---|===)\s*SCENE\s*(\d+)\s*(?:---|===)', text, flags=re.IGNORECASE)
+    scenes = []
+    if len(scene_blocks) > 1:
+        for i in range(1, len(scene_blocks), 2):
+            try:
+                sc_num = int(scene_blocks[i])
+            except ValueError:
+                sc_num = len(scenes) + 1
+            block = scene_blocks[i + 1]
+
+            # Extract timestamp range if present: [00:00:00,000 --> 00:00:02,305]
+            time_m = re.search(r'\[(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})\]', block)
+            start_str = time_m.group(1) if time_m else None
+            end_str = time_m.group(2) if time_m else None
+            start_t = _parse_time_str(start_str)
+            end_t = _parse_time_str(end_str)
+
+            # Extract Narration
+            narr_m = re.search(
+                r'Narration:\s*(.*?)(?=\n(?:Visual|Characters|Location|Lighting|Lighting/Mood|Mood|Camera|Image Prompt):|\Z)',
+                block,
+                re.DOTALL | re.IGNORECASE
+            )
+            narration = narr_m.group(1).strip() if narr_m else ""
+
+            # Extract Image Prompt
+            prompt_m = re.search(r'Image Prompt:\s*(.*?)(?=\n(?:---|===)\s*SCENE|\Z)', block, re.DOTALL | re.IGNORECASE)
+            prompt = prompt_m.group(1).strip() if prompt_m else ""
+
+            scenes.append({
+                "scene_number": sc_num,
+                "narration": narration,
+                "start_time": start_t,
+                "end_time": end_t,
+                "start_str": start_str,
+                "end_str": end_str,
+                "image_prompt": prompt,
+            })
+    else:
+        # Fallback: check if line-by-line format
+        lines = text.splitlines()
+        current_sc = 1
+        cur_narr = ""
+        cur_prompt = ""
+        for line in lines:
+            line_s = line.strip()
+            if line_s.lower().startswith("narration:"):
+                cur_narr = line_s.split(":", 1)[1].strip()
+            elif line_s.lower().startswith("image prompt:"):
+                cur_prompt = line_s.split(":", 1)[1].strip()
+                scenes.append({
+                    "scene_number": current_sc,
+                    "narration": cur_narr,
+                    "start_time": None,
+                    "end_time": None,
+                    "start_str": None,
+                    "end_str": None,
+                    "image_prompt": cur_prompt,
+                })
+                current_sc += 1
+                cur_narr = ""
+                cur_prompt = ""
+
+    return scenes
+
+
+def align_scenes_with_timed_segments(
+    scenes: list[dict],
+    timed_segments: list[dict],
+    audio_duration: float = 0.0
+) -> list[dict]:
+    """
+    Aligns scene script chunks against timed audio segments (e.g. from SRT or Whisper)
+    using monotonic sequence matching.
+    Calculates exact start and end timestamps so each image corresponds precisely
+    to when its script chunk is spoken in the audio.
+    """
+    if not scenes:
+        return []
+
+    # If no timed segments provided, check if scenes already have timestamps
+    if not timed_segments:
+        all_have_times = all(s.get("start_time") is not None and s.get("end_time") is not None for s in scenes)
+        if all_have_times:
+            result = []
+            for i, s in enumerate(scenes):
+                st = float(s["start_time"])
+                et = float(s["end_time"])
+                if i < len(scenes) - 1 and scenes[i + 1].get("start_time") is not None:
+                    next_st = float(scenes[i + 1]["start_time"])
+                    disp_dur = max(0.1, next_st - st)
+                else:
+                    disp_dur = max(0.1, (audio_duration - st) if audio_duration > st else (et - st))
+                res_scene = dict(s)
+                res_scene["start"] = st
+                res_scene["end"] = et
+                res_scene["display_duration"] = disp_dur
+                result.append(res_scene)
+            return result
+
+        # Fallback: proportional word-count distribution across audio_duration
+        if audio_duration > 0:
+            total_words = sum(max(1, len(s.get("narration", "").split())) for s in scenes) or 1
+            cur_t = 0.0
+            result = []
+            for i, s in enumerate(scenes):
+                w_count = max(1, len(s.get("narration", "").split()))
+                dur = (w_count / total_words) * audio_duration
+                res_scene = dict(s)
+                res_scene["start"] = cur_t
+                res_scene["end"] = cur_t + dur
+                res_scene["display_duration"] = max(0.1, dur)
+                result.append(res_scene)
+                cur_t += dur
+            return result
+
+        return [dict(s, start=i * 2.5, end=(i + 1) * 2.5, display_duration=2.5) for i, s in enumerate(scenes)]
+
+    import difflib
+
+    def _norm(w: str) -> str:
+        return re.sub(r'[^\w]', '', w.lower())
+
+    # 1. Flatten scene words
+    scene_words = []
+    scene_word_to_sc = []
+    for sc_idx, s in enumerate(scenes):
+        ws = [_norm(w) for w in s.get("narration", "").split() if _norm(w)]
+        for w in ws:
+            scene_words.append(w)
+            scene_word_to_sc.append(sc_idx)
+
+    # 2. Flatten timed segment words
+    srt_words = []
+    srt_word_times = []
+    for seg in timed_segments:
+        st = float(seg.get("start", 0.0) if isinstance(seg, dict) else getattr(seg, "start", 0.0))
+        et = float(seg.get("end", st + 1.0) if isinstance(seg, dict) else getattr(seg, "end", st + 1.0))
+        txt = str(seg.get("text", "") if isinstance(seg, dict) else getattr(seg, "text", ""))
+        ws = [_norm(w) for w in txt.split() if _norm(w)]
+        if not ws:
+            continue
+        dur = max(0.01, (et - st) / len(ws))
+        for i, w in enumerate(ws):
+            srt_words.append(w)
+            srt_word_times.append((st + i * dur, st + (i + 1) * dur))
+
+    if not srt_words:
+        return align_scenes_with_timed_segments(scenes, [], audio_duration=audio_duration)
+
+    # 3. Match using SequenceMatcher
+    matcher = difflib.SequenceMatcher(None, scene_words, srt_words)
+    scene_word_times = [None] * len(scene_words)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            for off in range(i2 - i1):
+                scene_word_times[i1 + off] = srt_word_times[j1 + off]
+
+    # 4. Interpolate gaps for unmatched scene words
+    last_t = srt_word_times[0][0] if srt_word_times else 0.0
+    for i in range(len(scene_word_times)):
+        if scene_word_times[i] is None:
+            next_t = None
+            next_i = None
+            for k in range(i + 1, len(scene_word_times)):
+                if scene_word_times[k] is not None:
+                    next_t = scene_word_times[k][0]
+                    next_i = k
+                    break
+            if next_t is None:
+                next_t = srt_word_times[-1][1] if srt_word_times else (audio_duration or (last_t + 2.0))
+                next_i = len(scene_word_times)
+            span_count = max(1, next_i - i + 1)
+            step = max(0.01, (next_t - last_t) / span_count)
+            scene_word_times[i] = (last_t + step, last_t + step * 2)
+        last_t = scene_word_times[i][1]
+
+    # 5. Compute scene start and end times
+    raw_timings = []
+    prev_st = 0.0
+    for sc_idx in range(len(scenes)):
+        w_indices = [idx for idx, s_idx in enumerate(scene_word_to_sc) if s_idx == sc_idx]
+        if w_indices:
+            st = scene_word_times[w_indices[0]][0]
+            et = scene_word_times[w_indices[-1]][1]
+        else:
+            st = prev_st
+            et = prev_st + 1.0
+        st = max(prev_st, st)
+        et = max(st + 0.1, et)
+        raw_timings.append((st, et))
+        prev_st = st
+
+    # 6. Build final scene dicts with display durations
+    result = []
+    num_scenes = len(scenes)
+    for idx, s in enumerate(scenes):
+        st, et = raw_timings[idx]
+        if idx == 0:
+            st = 0.0  # Scene 1 displays from start of video
+
+        if idx < num_scenes - 1:
+            next_st = raw_timings[idx + 1][0]
+            disp_dur = max(0.1, next_st - st)
+        else:
+            disp_dur = max(0.1, (audio_duration - st) if audio_duration > st else (et - st))
+
+        res_scene = dict(s)
+        res_scene["start"] = st
+        res_scene["end"] = et
+        res_scene["display_duration"] = disp_dur
+        result.append(res_scene)
+
+    return result
 
 
 def _parse_vtt_text(path: Path) -> str:

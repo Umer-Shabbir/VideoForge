@@ -77,6 +77,11 @@ class AspectRatio(str, Enum):
     INSTAGRAM = "4:5"
     CUSTOM = "custom"
 
+VALID_X264_PRESETS = {
+    "ultrafast", "superfast", "veryfast", "faster", "fast",
+    "medium", "slow", "slower", "veryslow", "placebo"
+}
+
 
 @dataclass
 class RenderProfile:
@@ -90,7 +95,8 @@ class RenderProfile:
     video_bitrate: str = "4M"
     audio_bitrate: str = "192k"
     crf: int = 23
-    preset_name: str = "medium"  # FFmpeg encoding preset
+    preset_name: str = "medium"  # FFmpeg encoding preset or preset style name
+    x264_preset: str = "fast"    # Dedicated valid x264 encoding preset for FFmpeg
     output_format: str = "mp4"
 
     # Layout
@@ -104,23 +110,30 @@ class RenderProfile:
     # Transitions
     transition_type: TransitionType = TransitionType.FADE
     transition_duration: float = 0.6
+    allowed_transitions: list[str] = field(default_factory=lambda: ["fade", "dissolve"])
 
     # Subtitles
     subtitle_enabled: bool = True
-    subtitle_mode: SubtitleMode = SubtitleMode.PHRASE
+    subtitle_mode: SubtitleMode = SubtitleMode.KARAOKE
     subtitle_font: str = "Arial"
-    subtitle_font_size: int = 72
+    subtitle_font_size: int = 44
     subtitle_primary_color: str = "&H00FFFFFF"   # ASS format: AABBGGRR
     subtitle_outline_color: str = "&H00000000"
     subtitle_back_color: str = "&H80000000"
     subtitle_bold: bool = True
-    subtitle_outline_width: float = 3.0
-    subtitle_shadow: float = 1.5
-    subtitle_margin_v: int = 80     # Vertical margin from bottom
+    subtitle_italic: bool = False
+    subtitle_spacing: float = 0.0
+    subtitle_uppercase: bool = False
+    subtitle_outline_width: float = 2.2
+    subtitle_shadow: float = 1.2
+    subtitle_margin_v: int = 60     # Vertical margin from bottom
     subtitle_max_chars: int = 42    # Max chars per line
     subtitle_max_lines: int = 2
     subtitle_karaoke_color: str = "&H0000FFFF"  # Highlight colour for karaoke mode (ASS AABBGGRR: yellow)
     subtitle_karaoke_outline: str = "&H00000000" # Outline of the highlight word
+    subtitle_border_style: int = 1   # 1 = outline + drop shadow, 3 = opaque bounding box
+    subtitle_alignment: int = 2      # ASS alignment: 2 = bottom-center, 5 = middle-center
+    subtitle_animation: str = "none" # "none", "pop", "bounce", "glow", "box"
 
     # Watermark / Branding
     watermark_enabled: bool = False
@@ -144,7 +157,19 @@ class RenderProfile:
     bgm_volume: float = 0.1  # Volume (0.0 to 1.0) for Background Music (ducking)
     bgm_fade_in: float = 2.0
     bgm_fade_out: float = 3.0
-    bgm_volume: float = 0.1  # 0.0 to 1.0, ducking volume
+
+    def get_x264_preset(self, default: str = "fast") -> str:
+        """
+        Return a guaranteed valid x264 encoding preset for FFmpeg (-preset).
+        Prevents passing style preset names (e.g. 'blueprint', 'clay') to FFmpeg.
+        """
+        cand = getattr(self, "x264_preset", "")
+        if cand and str(cand).lower() in VALID_X264_PRESETS:
+            return str(cand).lower()
+        cand = getattr(self, "preset_name", "")
+        if cand and str(cand).lower() in VALID_X264_PRESETS:
+            return str(cand).lower()
+        return default
 
     def to_dict(self) -> dict:
         d = {}
@@ -168,6 +193,13 @@ class RenderProfile:
                         pass
                 else:
                     setattr(obj, k, v)
+        # Ensure x264_preset is always a valid x264 encoding speed preset
+        if "x264_preset" in data and str(data["x264_preset"]).lower() in VALID_X264_PRESETS:
+            obj.x264_preset = str(data["x264_preset"]).lower()
+        elif "preset_name" in data and str(data["preset_name"]).lower() in VALID_X264_PRESETS:
+            obj.x264_preset = str(data["preset_name"]).lower()
+        else:
+            obj.x264_preset = "fast"
         return obj
 
     def resolution_str(self) -> str:
@@ -218,6 +250,7 @@ class Project:
     audio_path: Optional[Path] = None
     bgm_path: Optional[Path] = None
     transcript_path: Optional[Path] = None
+    prompts_path: Optional[Path] = None
     image_paths: list[Path] = field(default_factory=list)
 
     # Detected metadata
@@ -225,6 +258,7 @@ class Project:
     transcript_text: Optional[str] = None
     transcript_segments: list[dict] = field(default_factory=list) # [{"speaker": "A", "text": "..."}]
     transcript_word_count: int = 0
+    scene_chunks: list[dict] = field(default_factory=list) # [{"scene_num": 1, "narration": "...", "prompt": "..."}]
 
     # Status
     status: ProjectStatus = ProjectStatus.DISCOVERED
@@ -232,6 +266,7 @@ class Project:
 
     # Settings
     profile: RenderProfile = field(default_factory=RenderProfile)
+    preset_name: str = ""
 
     # Output
     output_folder: Optional[Path] = None
@@ -291,12 +326,15 @@ class Project:
             "audio_path": str(self.audio_path) if self.audio_path else None,
             "bgm_path": str(self.bgm_path) if self.bgm_path else None,
             "transcript_path": str(self.transcript_path) if self.transcript_path else None,
+            "prompts_path": str(self.prompts_path) if self.prompts_path else None,
             "image_paths": [str(p) for p in self.image_paths],
             "audio_duration": self.audio_duration,
             "transcript_text": self.transcript_text,
             "transcript_word_count": self.transcript_word_count,
+            "scene_chunks": self.scene_chunks,
             "status": self.status.value,
             "profile": self.profile.to_dict(),
+            "preset_name": self.preset_name,
             "output_folder": str(self.output_folder) if self.output_folder else None,
             "output_path": str(self.output_path) if self.output_path else None,
             "created_at": self.created_at,
@@ -316,13 +354,16 @@ class Project:
         p.audio_path = Path(data["audio_path"]) if data.get("audio_path") else None
         p.bgm_path = Path(data["bgm_path"]) if data.get("bgm_path") else None
         p.transcript_path = Path(data["transcript_path"]) if data.get("transcript_path") else None
+        p.prompts_path = Path(data["prompts_path"]) if data.get("prompts_path") else None
         p.image_paths = [Path(x) for x in data.get("image_paths", [])]
         p.audio_duration = data.get("audio_duration")
         p.transcript_text = data.get("transcript_text")
         p.transcript_word_count = data.get("transcript_word_count", 0)
+        p.scene_chunks = data.get("scene_chunks", [])
         p.status = ProjectStatus(data.get("status", ProjectStatus.DISCOVERED.value))
         if "profile" in data:
             p.profile = RenderProfile.from_dict(data["profile"])
+        p.preset_name = data.get("preset_name", "")
         p.output_folder = Path(data["output_folder"]) if data.get("output_folder") else None
         p.output_path = Path(data["output_path"]) if data.get("output_path") else None
         p.created_at = data.get("created_at", time.time())

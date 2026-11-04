@@ -1,4 +1,4 @@
-﻿"""
+"""
 Project validator: inspects a project before adding to queue.
 Returns a ValidationResult with detailed issues, warnings, and fix suggestions.
 """
@@ -101,12 +101,33 @@ def validate_project(project: Project, check_files: bool = True) -> ValidationRe
                     f"{', '.join(Path(u).name for u in unreadable[:3])}"
                 )
 
-    # ── Transcript ────────────────────────────────────────────────────────────
+    # ── Scene Chunks (prompts.txt) Validation ─────────────────────────────────
+    if getattr(p, "scene_chunks", None):
+        import re
+        scene_count = len(p.scene_chunks)
+        img_count = len(p.image_paths)
+        if scene_count > 0 and img_count != scene_count:
+            img_indices = set()
+            for img in p.image_paths:
+                m = re.match(r"^(\d+)\b", img.stem)
+                if m:
+                    img_indices.add(int(m.group(1)))
+            expected_indices = set(range(1, scene_count + 1))
+            missing_indices = expected_indices - img_indices
+            if missing_indices:
+                missing_sorted = sorted(list(missing_indices))
+                missing_str = ", ".join(str(x) for x in missing_sorted[:5])
+                if len(missing_sorted) > 5:
+                    missing_str += f"... (+{len(missing_sorted) - 5} more)"
+                result.add_warning(
+                    f"Missing image files for scene chunks: {missing_str} ({img_count}/{scene_count} images found)."
+                )
+
+    # ── Transcript & 1:1 Subtitle Chunk Validation ─────────────────────────────
     if p.transcript_path is None:
         result.add_warning(
             "No transcript/script file found.",
         )
-        # Not an error — we can render without subtitles
     else:
         if check_files and not p.transcript_path.exists():
             result.add_error(
@@ -122,6 +143,44 @@ def validate_project(project: Project, check_files: bool = True) -> ValidationRe
                     f"Transcript is very long ({word_count:,} words). "
                     "Alignment may take extra time."
                 )
+
+            # Strict 1:1 subtitle check when transcript is an SRT file and no scene chunks are present
+            if not getattr(p, "scene_chunks", None) and p.transcript_path and str(p.transcript_path).lower().endswith(".srt") and p.transcript_path.exists():
+                try:
+                    import re
+                    from app.utils.file_utils import parse_srt_segments
+                    timed_segs = parse_srt_segments(p.transcript_path)
+                    if timed_segs:
+                        chunk_count = len(timed_segs)
+                        img_count = len(p.image_paths)
+                        # Only enforce strict 1:1 mismatch if project is explicitly 1:1 or small numbered storyboard
+                        is_1_to_1_project = getattr(p, "strict_1_to_1", False) or getattr(p, "sync_mode_1_to_1", False) or (chunk_count <= 25 and img_count <= 25)
+                        if is_1_to_1_project and img_count != chunk_count:
+                            result.add_error(
+                                f"1:1 Image-to-Subtitle mismatch: Found {img_count} images for {chunk_count} subtitle chunks.",
+                                f"Ensure each subtitle chunk has its corresponding numbered image (1.png to {chunk_count}.png)."
+                            )
+
+                        # Check for missing numbered image indices if 1:1 project
+                        if is_1_to_1_project:
+                            img_indices = set()
+                            for img in p.image_paths:
+                                m = re.match(r"^(\d+)\b", img.stem)
+                                if m:
+                                    img_indices.add(int(m.group(1)))
+                            expected_indices = set(range(1, chunk_count + 1))
+                            missing_indices = expected_indices - img_indices
+                            if missing_indices:
+                                missing_sorted = sorted(list(missing_indices))
+                                missing_str = ", ".join(str(x) for x in missing_sorted[:5])
+                                if len(missing_sorted) > 5:
+                                    missing_str += f"... (+{len(missing_sorted) - 5} more)"
+                                result.add_error(
+                                    f"Missing image files for subtitle chunk indices: {missing_str}",
+                                    f"Provide numbered images {missing_str} matching the subtitle chunks."
+                                )
+                except Exception as e:
+                    log.warning(f"Could not parse SRT for 1:1 validation: {e}")
         else:
             result.add_warning("Transcript text could not be read.")
 

@@ -412,8 +412,8 @@ class QueueManager(QObject):
         self.job_failed.emit(job_id, error)
         self.queue_changed.emit()
 
-        # Auto-retry only for transient errors, not permanent ones like missing files
-        _permanent_errors = ("not found", "no such file", "missing", "access is denied")
+        # Auto-retry only for transient errors, not permanent ones like missing files or syntax errors
+        _permanent_errors = ("not found", "no such file", "missing", "access is denied", "invalid preset", "error setting preset")
         is_permanent = any(kw in (error or "").lower() for kw in _permanent_errors)
 
         if job and job.can_retry() and not is_permanent:
@@ -472,46 +472,66 @@ class QueueManager(QObject):
 
 def _apply_subtitle_defaults(project, settings) -> None:
     """
-    Copy global subtitle style settings to a project profile
-    so that global changes in Settings take effect on all queued renders.
-    Only applied if the project is using the default font (not user-customized).
+    Ensure the project profile has accurate subtitle styling.
+    If the project has an assigned preset (or project.json), synchronizes
+    the preset's unique typography and styling.
+    Otherwise, applies global settings defaults for unassigned projects.
     """
     try:
+        from app.services.project_scanner import sync_project_preset_styling
+        if sync_project_preset_styling(project, settings):
+            return
+
         pr = project.profile
-        # Only override if font matches default "Arial" (not user-customized)
+        # Only apply global defaults if font is default Arial and no custom font set
         if pr.subtitle_font == "Arial" or not pr.subtitle_font:
             pr.subtitle_font = settings.get("sub_font", "Arial")
-        pr.subtitle_font_size    = settings.get("sub_font_size", pr.subtitle_font_size)
-        pr.subtitle_bold         = settings.get("sub_bold", pr.subtitle_bold)
-        pr.subtitle_outline_width= settings.get("sub_outline_width", pr.subtitle_outline_width)
-        pr.subtitle_shadow       = settings.get("sub_shadow", pr.subtitle_shadow)
-        pr.subtitle_margin_v     = settings.get("sub_margin_v", pr.subtitle_margin_v)
-        pr.subtitle_max_chars    = settings.get("sub_max_chars", pr.subtitle_max_chars)
+            if not pr.subtitle_font_size or pr.subtitle_font_size == 44:
+                pr.subtitle_font_size = settings.get("sub_font_size", 54)
+            if pr.subtitle_outline_width is None:
+                pr.subtitle_outline_width = settings.get("sub_outline_width", 2.2)
+            if pr.subtitle_shadow is None:
+                pr.subtitle_shadow = settings.get("sub_shadow", 1.2)
+            if not pr.subtitle_margin_v:
+                pr.subtitle_margin_v = settings.get("sub_margin_v", 60)
+            if not pr.subtitle_max_chars:
+                pr.subtitle_max_chars = settings.get("sub_max_chars", 42)
 
-        # Convert hex colors to ASS format if provided in settings
-        def hex_to_ass(h: str, default: str) -> str:
-            if not h or not h.startswith("#") or len(h) != 7:
-                return default
-            b, g, r = h[5:7], h[3:5], h[1:3]
-            return f"&H00{b}{g}{r}".upper()
+            def hex_to_ass(h: str, default: str) -> str:
+                if not h or not h.startswith("#") or len(h) != 7:
+                    return default
+                b, g, r = h[5:7], h[3:5], h[1:3]
+                return f"&H00{b}{g}{r}".upper()
 
-        pr.subtitle_primary_color = hex_to_ass(
-            settings.get("sub_primary_color", ""), pr.subtitle_primary_color
-        )
-        pr.subtitle_outline_color = hex_to_ass(
-            settings.get("sub_outline_color", ""), pr.subtitle_outline_color
-        )
-        pr.subtitle_karaoke_color = hex_to_ass(
-            settings.get("sub_karaoke_color", "#FFFF00"),
-            pr.subtitle_karaoke_color
-        )
+            if not pr.subtitle_primary_color:
+                pr.subtitle_primary_color = hex_to_ass(
+                    settings.get("sub_primary_color", ""), "&H00FFFFFF"
+                )
+            if not pr.subtitle_outline_color:
+                pr.subtitle_outline_color = hex_to_ass(
+                    settings.get("sub_outline_color", ""), "&H00000000"
+                )
+            if not pr.subtitle_karaoke_color:
+                pr.subtitle_karaoke_color = hex_to_ass(
+                    settings.get("sub_karaoke_color", "#FFFF00"),
+                    "&H0000FFFF"
+                )
 
         from app.core.project import SubtitleMode
         mode_str = settings.get("sub_mode", "")
-        if mode_str:
+        if pr.subtitle_mode == SubtitleMode.KARAOKE:
+            pr.subtitle_enabled = True
+        elif mode_str.lower() == "karaoke":
+            pr.subtitle_mode = SubtitleMode.KARAOKE
+            pr.subtitle_enabled = True
+        elif not pr.subtitle_mode and mode_str:
             try:
                 pr.subtitle_mode = SubtitleMode(mode_str)
             except ValueError:
                 pass
+            if settings.get("sub_enabled", True):
+                pr.subtitle_enabled = True
+        elif settings.get("sub_enabled", True):
+            pr.subtitle_enabled = True
     except Exception:
         pass  # never fail a render because of subtitle style settings

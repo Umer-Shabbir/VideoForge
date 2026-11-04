@@ -93,20 +93,90 @@ class AppState(QObject):
         # Check FFmpeg
         self._check_ffmpeg()
 
+        # Automatic temp directory cleanup on startup
+        try:
+            self.cleanup_orphaned_temp_dirs()
+        except Exception as e:
+            log.warning(f"Startup temp cleanup encountered an error: {e}")
+
         self._initialized = True
         log.info("AppState initialized successfully")
+
+    def cleanup_orphaned_temp_dirs(self) -> tuple[int, float]:
+        """
+        Scan for and purge orphaned `_vf_temp` directories across all loaded projects,
+        workspace folders, and system temp directory.
+        Returns (purged_dir_count, reclaimed_megabytes).
+        """
+        import shutil
+        import tempfile
+        purged_count = 0
+        total_bytes = 0
+
+        # Gather target folders to check
+        target_dirs = set()
+        for p in self._projects.values():
+            if p.folder and Path(p.folder).exists():
+                target_dirs.add(Path(p.folder) / "_vf_temp")
+
+        # Also check configured workspace / import directories
+        if self.settings:
+            ws = self.settings.get("workspace_folder", "")
+            if ws and Path(ws).exists():
+                try:
+                    for child in Path(ws).iterdir():
+                        if child.is_dir():
+                            target_dirs.add(child / "_vf_temp")
+                except Exception:
+                    pass
+
+        # Also scan system temp for orphaned vf temp dirs
+        sys_temp = Path(tempfile.gettempdir())
+        try:
+            for p in sys_temp.glob("_vf_temp*"):
+                if p.is_dir():
+                    target_dirs.add(p)
+            for p in sys_temp.glob("videoforge_*"):
+                if p.is_dir():
+                    target_dirs.add(p)
+        except Exception:
+            pass
+
+        for td in target_dirs:
+            if td.exists() and td.is_dir():
+                try:
+                    # Calculate size
+                    dir_size = sum(f.stat().st_size for f in td.glob("**/*") if f.is_file())
+                    shutil.rmtree(td, ignore_errors=True)
+                    purged_count += 1
+                    total_bytes += dir_size
+                    log.info(f"Purged orphaned temp directory: {td} ({dir_size / (1024*1024):.2f} MB)")
+                except Exception as exc:
+                    log.warning(f"Could not purge temp directory {td}: {exc}")
+
+        reclaimed_mb = total_bytes / (1024 * 1024)
+        if purged_count > 0:
+            log.info(f"Automatic temp cleanup: purged {purged_count} orphaned temp directories ({reclaimed_mb:.2f} MB reclaimed)")
+        else:
+            log.debug("Automatic temp cleanup: no orphaned temp directories found")
+
+        return purged_count, reclaimed_mb
 
     def _load_persisted_projects(self):
         """Load project list from database, re-checking file existence."""
         if not self.db:
             return
         try:
+            from app.services.project_scanner import sync_project_preset_styling
             projects = self.db.load_all_projects()
             for p in projects:
                 # Reset stuck processing state
                 if p.status == ProjectStatus.PROCESSING:
                     p.status = ProjectStatus.FAILED
                     p.error_message = "Interrupted by application restart"
+
+                # Synchronize preset typography and subtitle styles
+                sync_project_preset_styling(p, self.settings)
 
                 # Re-validate file existence — files may have moved since last run
                 if p.status not in (ProjectStatus.COMPLETED, ProjectStatus.FAILED,
@@ -149,12 +219,30 @@ class AppState(QObject):
     # ─── Project Management ───────────────────────────────────────────────────
 
     def add_project(self, project: Project) -> bool:
-        """Add a project to the state. Returns False if duplicate folder."""
+        """Add a project to the state. Updates existing project if duplicate folder."""
+        from app.services.project_scanner import sync_project_preset_styling
         # Check for duplicate folders
         for existing in self._projects.values():
             if existing.folder == project.folder:
-                log.info(f"Duplicate folder ignored: {project.folder}")
+                # Update existing project with newly scanned profile/preset
+                existing.preset_name = project.preset_name or existing.preset_name
+                sync_project_preset_styling(existing, self.settings)
+                if project.audio_path:
+                    existing.audio_path = project.audio_path
+                if project.transcript_path:
+                    existing.transcript_path = project.transcript_path
+                if project.image_paths:
+                    existing.image_paths = project.image_paths
+                if project.prompts_path:
+                    existing.prompts_path = project.prompts_path
+                if self.db:
+                    self.db.save_project(existing)
+                self.project_updated.emit(existing.id)
+                self.projects_changed.emit()
+                log.info(f"Updated existing project from folder: {project.folder} (preset: {existing.preset_name})")
                 return False
+
+        sync_project_preset_styling(project, self.settings)
         self._projects[project.id] = project
         if self.db:
             self.db.save_project(project)
@@ -176,6 +264,10 @@ class AppState(QObject):
             self.db.save_project(project)
         self.project_updated.emit(project.id)
         self.projects_changed.emit()
+
+    def save_project(self, project: Project):
+        """Alias for update_project for backward compatibility."""
+        self.update_project(project)
 
     def remove_project(self, project_id: str):
         """Remove a project from state and database."""
@@ -235,26 +327,56 @@ class AppState(QObject):
             except Exception as e:
                 log.warning(f"Could not resolve output path for {project.name}: {e}")
 
-        # Apply global subtitle settings so Settings changes take effect on every render.
-        # The project profile stored in DB reflects the state at import time (phrase mode by
-        # default). Users expect Settings → Subtitles to be the authoritative global override.
+        # Ensure preset typography and subtitle style are synchronized
+        from app.services.project_scanner import sync_project_preset_styling
+        sync_project_preset_styling(project, self.settings)
+
+        # Apply global subtitle settings so Settings changes take effect on every render,
+        # but preserve project-level customizations (e.g. if project specifically enabled karaoke).
         if self.settings:
             from app.core.project import SubtitleMode
             sub_mode_raw = self.settings.get("sub_mode", "phrase")
-            try:
-                project.profile.subtitle_mode = SubtitleMode(sub_mode_raw)
-            except ValueError:
-                pass
-            # Apply karaoke highlight colour (#RRGGBB → ASS &H00BBGGRR)
-            kara_hex = self.settings.get("sub_karaoke_color", "#FFFF00")
-            h = kara_hex.lstrip("#")
-            if len(h) == 6:
-                r, g, b = h[0:2], h[2:4], h[4:6]
-                project.profile.subtitle_karaoke_color = f"&H00{b}{g}{r}".upper()
+            sub_enabled_global = self.settings.get("sub_enabled", True)
+
+            # Preserve preset subtitle mode if already configured, otherwise respect global setting
+            if project.profile.subtitle_mode == SubtitleMode.KARAOKE:
+                project.profile.subtitle_enabled = True
+            elif sub_mode_raw.lower() == "karaoke":
+                project.profile.subtitle_mode = SubtitleMode.KARAOKE
+                project.profile.subtitle_enabled = True
+            elif not project.profile.subtitle_mode:
+                try:
+                    project.profile.subtitle_mode = SubtitleMode(sub_mode_raw)
+                except ValueError:
+                    pass
+                if sub_enabled_global:
+                    project.profile.subtitle_enabled = True
+
+            # If project has an assigned preset or subtitles are globally enabled, ensure subtitle_enabled is True
+            if sub_enabled_global or (project.preset_name and project.preset_name.lower() != "default"):
+                project.profile.subtitle_enabled = True
+
+            # Preserve preset karaoke highlight colour; only apply global default if unset
+            if not getattr(project.profile, "subtitle_karaoke_color", None):
+                kara_hex = self.settings.get("sub_karaoke_color", "#FFFF00")
+                h = kara_hex.lstrip("#")
+                if len(h) == 6:
+                    r, g, b = h[0:2], h[2:4], h[4:6]
+                    project.profile.subtitle_karaoke_color = f"&H00{b}{g}{r}".upper()
+            
+            # Avoid invisible highlight where karaoke color matches primary color (e.g. punk_zine)
+            if getattr(project.profile, "subtitle_karaoke_color", "") == getattr(project.profile, "subtitle_primary_color", ""):
+                # Use high-contrast alternate highlight
+                pri = getattr(project.profile, "subtitle_primary_color", "")
+                project.profile.subtitle_karaoke_color = "&H003300FF" if "FFFF" in pri else "&H0000FFFF"
             log.debug(
                 f"[{project.name}] subtitle mode → {project.profile.subtitle_mode.value} "
-                f"karaoke colour → {project.profile.subtitle_karaoke_color}"
+                f"karaoke colour → {project.profile.subtitle_karaoke_color} "
+                f"subtitle enabled → {project.profile.subtitle_enabled}"
             )
+
+        if self.db:
+            self.db.save_project(project)
 
         # Skip if output already exists and skip_completed is enabled
         if (self.settings

@@ -20,6 +20,17 @@ log = logging.getLogger("videoforge.aligner")
 _MODEL_CACHE: dict = {}
 _MODEL_LOCK = threading.Lock()
 
+# Patch PyAV 14+ compatibility where metadata_errors was removed
+try:
+    import av
+    _orig_av_open = av.open
+    def _safe_av_open(*args, **kwargs):
+        kwargs.pop("metadata_errors", None)
+        return _orig_av_open(*args, **kwargs)
+    av.open = _safe_av_open
+except Exception:
+    pass
+
 
 def align_subtitles(
     project: Project,
@@ -45,6 +56,37 @@ def align_subtitles(
 
     if progress_callback:
         progress_callback(5.0, "Preparing subtitle alignment...")
+
+    # Check for pre-timed subtitle file (SRT) in project
+    srt_file = None
+    if project.transcript_path and str(project.transcript_path).lower().endswith(".srt") and project.transcript_path.exists():
+        srt_file = project.transcript_path
+    elif project.folder and Path(project.folder).exists():
+        for candidate_name in ("transcript.srt", "audio.srt"):
+            candidate_p = Path(project.folder) / candidate_name
+            if candidate_p.exists():
+                srt_file = candidate_p
+                break
+
+    if srt_file:
+        try:
+            from app.utils.file_utils import parse_srt_segments
+            timed_segments = parse_srt_segments(srt_file)
+            if timed_segments:
+                log.info(f"[{project.name}] Aligning with {len(timed_segments)} pre-timed segments from {srt_file.name}")
+                if progress_callback:
+                    progress_callback(20.0, f"Using pre-timed transcript ({srt_file.name})...")
+                from app.subtitles.segmenter import create_chunks_from_srt_segments
+                chunks = create_chunks_from_srt_segments(
+                    timed_segments,
+                    audio_duration=audio_duration,
+                    transcript_segments=getattr(project, "transcript_segments", None),
+                )
+                if chunks:
+                    log.info(f"[{project.name}] Pre-timed alignment produced {len(chunks)} subtitle chunks (1:1 with SRT blocks)")
+                    return chunks
+        except Exception as e:
+            log.warning(f"[{project.name}] Pre-timed SRT alignment failed: {e}. Trying fallback.")
 
     # Try whisper alignment
     whisper_available = _check_whisper_available()
@@ -250,6 +292,7 @@ def _align_with_whisper(
         max_chars=max_chars,
         max_lines=max_lines,
         transcript_segments=transcript_segments,
+        audio_duration=total_dur,
     )
 
     return chunks
@@ -267,3 +310,97 @@ def estimate_whisper_time(audio_duration: float, model_size: str = "small") -> f
     # Approximate real-time factors on CPU
     rtf = {"tiny": 0.5, "base": 0.8, "small": 1.5, "medium": 3.0, "large": 6.0}
     return audio_duration * rtf.get(model_size, 1.5)
+
+
+def force_align_project(
+    project: Project,
+    progress_callback: Optional[Callable] = None,
+    cancel_flag=None,
+) -> Optional[Path]:
+    """
+    Directly force-align audio and script for a project, bypassing any existing SRT.
+    Uses Whisper acoustic alignment to generate a fresh, accurate `transcript.srt`
+    in the project directory and updates project metadata.
+    """
+    if not project.audio_path or not project.audio_path.exists():
+        log.error(f"[{project.name}] Cannot force-align: audio file not found")
+        return None
+
+    # Resolve script text
+    script_text = project.transcript_text
+    if not script_text or not script_text.strip():
+        # Check files
+        for cand in ("script.txt", "text.txt", "transcript.txt"):
+            cand_p = project.folder / cand if project.folder else None
+            if cand_p and cand_p.exists():
+                try:
+                    script_text = cand_p.read_text(encoding="utf-8")
+                    break
+                except Exception:
+                    pass
+    if not script_text or not script_text.strip():
+        log.error(f"[{project.name}] Cannot force-align: no script text available")
+        return None
+
+    project.transcript_text = script_text
+
+    if progress_callback:
+        progress_callback(10.0, "Starting forced alignment...")
+
+    # Run whisper acoustic alignment directly
+    whisper_available = _check_whisper_available()
+    audio_dur = project.audio_duration or 0.0
+    if audio_dur <= 0:
+        from app.utils.file_utils import get_audio_duration
+        audio_dur = get_audio_duration(project.audio_path)
+        project.audio_duration = audio_dur
+
+    chunks = []
+    if whisper_available and audio_dur > 0:
+        try:
+            chunks = _align_with_whisper(
+                project.audio_path,
+                clean_transcript(script_text),
+                mode=project.profile.subtitle_mode,
+                max_chars=project.profile.subtitle_max_chars,
+                max_lines=project.profile.subtitle_max_lines,
+                subtitle_mode=project.profile.subtitle_mode,
+                whisper_model=_get_whisper_model_setting(),
+                whisper_device=_get_whisper_device_setting(),
+                whisper_language=_get_whisper_language_setting(),
+                progress_callback=progress_callback,
+                cancel_flag=cancel_flag,
+                transcript_segments=getattr(project, "transcript_segments", [])
+            )
+        except Exception as e:
+            log.warning(f"[{project.name}] Whisper forced alignment failed: {e}. Falling back to even distribution.")
+
+    if not chunks:
+        # Fallback: even distribution
+        chunks_text = segment_text(clean_transcript(script_text), project.profile.subtitle_mode,
+                                   project.profile.subtitle_max_chars, project.profile.subtitle_max_lines)
+        if audio_dur > 0:
+            chunks = distribute_chunks_evenly(chunks_text, audio_dur)
+        else:
+            chunks = [SubtitleChunk(text=c) for c in chunks_text]
+
+    out_srt = Path(project.folder) / "transcript.srt"
+    if out_srt.exists():
+        try:
+            import shutil
+            bak_srt = out_srt.with_suffix(".srt.bak")
+            shutil.copy2(out_srt, bak_srt)
+            log.info(f"[{project.name}] Existing SRT backed up to {bak_srt.name}")
+        except Exception as e:
+            log.warning(f"[{project.name}] Failed to create backup of existing SRT: {e}")
+
+    from app.subtitles.styler import write_srt_file
+    if write_srt_file(chunks, out_srt):
+        project.transcript_path = out_srt
+        project.transcript_word_count = len(clean_transcript(script_text).split())
+        project.sub_chunks = chunks
+        log.info(f"[{project.name}] Forced alignment saved: {out_srt} ({len(chunks)} chunks)")
+        if progress_callback:
+            progress_callback(100.0, f"Alignment complete ({len(chunks)} chunks)")
+        return out_srt
+    return None

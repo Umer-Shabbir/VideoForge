@@ -215,12 +215,90 @@ def distribute_chunks_evenly(
     return result
 
 
+def create_chunks_from_srt_segments(
+    timed_segments: list[dict],
+    audio_duration: float = 0.0,
+    transcript_segments: Optional[list[dict]] = None
+) -> list[SubtitleChunk]:
+    """
+    Directly converts pre-timed SRT segments into SubtitleChunk objects.
+    Preserves strict 1:1 chunk mapping so that Chunk i corresponds to Image i.
+    Populates word_starts and word_ends per chunk for frame-accurate karaoke highlight.
+    """
+    if not timed_segments:
+        return []
+
+    chunks = []
+    spk_map = {}
+    if transcript_segments:
+        for seg in transcript_segments:
+            txt = clean_transcript(seg.get("text", "")).lower()
+            spk = seg.get("speaker")
+            if txt and spk:
+                spk_map[txt[:40]] = spk
+
+    for i, seg in enumerate(timed_segments):
+        start = float(seg.get("start", 0.0))
+        end = float(seg.get("end", start + 1.0))
+        text = clean_transcript(seg.get("text", ""))
+        if not text:
+            continue
+
+        words = text.split()
+        n_words = len(words)
+        dur = max(0.05, end - start)
+
+        # Proportional word timing: long words receive proportionally more active time
+        # than short words (e.g. "a", "in" vs "cryptanalyst", "decentralized")
+        raw_lens = [max(1, len(re.sub(r'[^\w]', '', w))) for w in words]
+        total_len = sum(raw_lens) or 1
+
+        w_starts = []
+        w_ends = []
+        cur_w_start = start
+        for w_len in raw_lens:
+            w_span = (w_len / total_len) * dur
+            w_starts.append(cur_w_start)
+            cur_w_start += w_span
+            w_ends.append(cur_w_start)
+        if w_ends:
+            w_ends[-1] = max(w_starts[-1] + 0.04, end)
+
+        speaker = None
+        clean_prefix = text.lower()[:40]
+        for k, spk in spk_map.items():
+            if k in clean_prefix or clean_prefix in k:
+                speaker = spk
+                break
+
+        chunks.append(SubtitleChunk(
+            text=text,
+            start=max(0.0, start),
+            end=max(start + 0.05, end),
+            words=words,
+            word_starts=w_starts,
+            word_ends=w_ends,
+            speaker=speaker,
+        ))
+
+    # Clamp or stretch the last chunk to audio_duration if near the end
+    if chunks and audio_duration > 0 and chunks[-1].end < audio_duration:
+        gap = audio_duration - chunks[-1].end
+        if gap <= 10.0:
+            chunks[-1].end = audio_duration
+            if chunks[-1].word_ends:
+                chunks[-1].word_ends[-1] = audio_duration
+
+    return chunks
+
+
 def align_whisper_segments(
     whisper_segments: list[dict],
     mode: SubtitleMode,
     max_chars: int = 42,
     max_lines: int = 2,
     transcript_segments: Optional[list[dict]] = None,
+    audio_duration: float = 0.0,
 ) -> list[SubtitleChunk]:
     """
     Convert whisper segments (with word-level timestamps) into subtitle chunks.
@@ -243,6 +321,14 @@ def align_whisper_segments(
                         "start": w.get("start", seg_start),
                         "end":   w.get("end",   seg_end),
                     })
+        elif "word" in seg:
+            word = seg.get("word", "").strip()
+            if word:
+                timed_words.append({
+                    "word":  word,
+                    "start": seg.get("start", seg_start),
+                    "end":   seg.get("end",   seg_end),
+                })
         else:
             words = seg.get("text", "").split()
             if not words:
@@ -273,7 +359,6 @@ def align_whisper_segments(
         ts_len = len(ts_words)
         for tw in timed_words:
             w_clean = re.sub(r'[^\w]', '', tw["word"].lower())
-            # Look ahead slightly in ts_words to resync
             assigned_spk = None
             for offset in range(min(5, ts_len - ts_idx)):
                 ts_w, ts_spk = ts_words[ts_idx + offset]
@@ -283,7 +368,6 @@ def align_whisper_segments(
                     ts_idx += offset + 1
                     break
 
-            # If no match found within window, just use the last known or next available speaker
             if not assigned_spk and ts_idx < ts_len:
                 assigned_spk = ts_words[ts_idx][1]
                 ts_idx += 1
@@ -292,18 +376,14 @@ def align_whisper_segments(
 
     # Pre-compute cleaned lowercase alphanumeric strings for timed_words
     timed_words_clean = [re.sub(r'[^\w]', '', w["word"].lower()) for w in timed_words]
-
     full_text = " ".join(w["word"] for w in timed_words)
 
-    # ── Decide chunk size for karaoke / viral mode ────────────────────────────
     from app.core.project import SubtitleMode as _SM
     actual_mode = mode
     if mode == _SM.KARAOKE:
-        # Karaoke uses viral-sized chunks (3-5 words) so each chunk is
-        # short enough to read while the highlight moves through it
         actual_mode = _SM.VIRAL
 
-    display_chunks = []  # List of dict: {"text": str, "speaker": Optional[str]}
+    display_chunks = []
     if transcript_segments:
         for seg in transcript_segments:
             seg_chunks = segment_text(seg["text"], actual_mode, max_chars, max_lines)
@@ -317,14 +397,6 @@ def align_whisper_segments(
     if not display_chunks:
         return []
 
-    # ── Align each chunk to word timestamps ───────────────────────────────────
-    # Strategy:
-    #   Walk through timed_words sequentially. For each display chunk, try to
-    #   match its words in order against the next timed_words entries.
-    #   Whisper often merges punctuation into tokens ("world," vs "world") so
-    #   we strip non-word characters before comparing.
-    #   If a chunk can't be matched we fall back to consuming the next N words
-    #   directly to avoid the word_idx pointer drifting off track.
     result: list[SubtitleChunk] = []
     word_idx = 0
     total_timed = len(timed_words)
@@ -336,83 +408,138 @@ def align_whisper_segments(
         if not chunk_words:
             continue
         if word_idx >= total_timed:
-            break  # exhausted timed words — remaining chunks get no timing
+            # Do not break - extrapolate remaining chunks below
+            break
 
+        n_words = len(chunk_words)
         chunk_words_clean = [re.sub(r'[^\w]', '', w.lower()) for w in chunk_words]
 
-        start_time      = None
-        end_time        = None
-        matched         = 0
-        chunk_word_data: list[dict] = []
+        # Search window in timed_words
+        search_limit = min(word_idx + max(n_words * 2, n_words + 15), total_timed)
 
-        # Search window: don't let it go too far past current position
-        search_limit = min(word_idx + len(chunk_words) + 8, total_timed)
-
-        for i in range(word_idx, search_limit):
-            tw       = timed_words[i]
-            tw_clean = timed_words_clean[i]
-            ck_clean = chunk_words_clean[matched] if matched < len(chunk_words_clean) else ""
-
-            is_match = bool(
-                tw_clean and ck_clean and (
-                    tw_clean == ck_clean
-                    or tw_clean.startswith(ck_clean)
-                    or ck_clean.startswith(tw_clean)
-                )
-            )
-
-            if is_match:
-                if matched == 0:
-                    start_time = tw["start"]
-                    word_idx   = i       # anchor the pointer at first match
-                chunk_word_data.append(tw)
-                matched += 1
-                end_time = tw["end"]
-                if matched >= len(chunk_words):
-                    word_idx = i + 1    # advance past last matched word
+        # Monotonically match words in chunk_words against timed_words
+        matched_map: dict[int, int] = {}  # chunk_pos -> tw_index
+        scan_pos = word_idx
+        for c_pos, cw in enumerate(chunk_words_clean):
+            if not cw:
+                continue
+            for tw_i in range(scan_pos, search_limit):
+                tw = timed_words_clean[tw_i]
+                if not tw:
+                    continue
+                if tw == cw or tw.startswith(cw) or cw.startswith(tw):
+                    matched_map[c_pos] = tw_i
+                    scan_pos = tw_i + 1
                     break
-            elif matched > 0:
-                # Partial match — accept if we got at least half the words
-                if matched >= max(1, len(chunk_words) // 2):
-                    word_idx = i        # don't advance past the unmatched word
-                    break
-                # Otherwise reset and keep looking from current position
-                # (handles cases where a spurious near-match fires early)
-                matched = 0
-                chunk_word_data = []
-                start_time = None
-                end_time = None
 
-        # Fallback: consume the next N timed words directly
-        if start_time is None and word_idx < total_timed:
-            n          = len(chunk_words)
-            end_idx    = min(word_idx + n, total_timed)
-            start_time = timed_words[word_idx]["start"]
-            end_time   = timed_words[end_idx - 1]["end"]
-            chunk_word_data = timed_words[word_idx:end_idx]
-            word_idx   = end_idx
-            log.debug(
-                f"align_whisper: fallback consumed {n} words for chunk '{chunk_text[:30]}'"
-            )
+        w_starts: list[float] = [0.0] * n_words
+        w_ends: list[float] = [0.0] * n_words
 
-        if start_time is None or end_time is None:
-            continue
+        prev_chunk_end = result[-1].end if result else (timed_words[0]["start"] if timed_words else 0.0)
 
-        # Pad end_time if it equals start (Whisper can give zero-duration words)
-        if end_time <= start_time:
-            end_time = start_time + max(
-                0.1, (chunk_word_data[-1]["end"] - chunk_word_data[0]["start"])
-            )
+        if matched_map:
+            # Advance word_idx to strictly after the last matched word
+            last_matched_tw_idx = max(matched_map.values())
+            word_idx = last_matched_tw_idx + 1
+
+            # Populate matched words first
+            for c_pos, tw_idx in matched_map.items():
+                w_starts[c_pos] = timed_words[tw_idx]["start"]
+                w_ends[c_pos] = timed_words[tw_idx]["end"]
+
+            # Interpolate leading unmatched words
+            first_matched_pos = min(matched_map.keys())
+            if first_matched_pos > 0:
+                first_start = w_starts[first_matched_pos]
+                span_start = max(prev_chunk_end, first_start - (first_matched_pos * 0.3))
+                step = (first_start - span_start) / first_matched_pos
+                for j in range(first_matched_pos):
+                    w_starts[j] = span_start + j * step
+                    w_ends[j] = span_start + (j + 1) * step
+
+            # Interpolate internal gaps
+            prev_pos = first_matched_pos
+            for c_pos in sorted(matched_map.keys()):
+                if c_pos > prev_pos + 1:
+                    gap_count = c_pos - prev_pos - 1
+                    gap_start = w_ends[prev_pos]
+                    gap_end = w_starts[c_pos]
+                    if gap_end <= gap_start:
+                        gap_end = gap_start + (gap_count * 0.2)
+                    step = (gap_end - gap_start) / (gap_count + 1)
+                    for k in range(gap_count):
+                        idx = prev_pos + 1 + k
+                        w_starts[idx] = gap_start + k * step
+                        w_ends[idx] = gap_start + (k + 1) * step
+                prev_pos = c_pos
+
+            # Interpolate trailing unmatched words
+            last_matched_pos = max(matched_map.keys())
+            if last_matched_pos < n_words - 1:
+                tail_count = n_words - 1 - last_matched_pos
+                tail_start = w_ends[last_matched_pos]
+                for k in range(tail_count):
+                    idx = last_matched_pos + 1 + k
+                    w_starts[idx] = tail_start + k * 0.25
+                    w_ends[idx] = tail_start + (k + 1) * 0.25
+        else:
+            # No words matched in this chunk: estimate smoothly from current audio position
+            c_start = max(prev_chunk_end, timed_words[word_idx]["start"] if word_idx < total_timed else prev_chunk_end)
+            c_dur = max(0.4, n_words * 0.35)
+            step = c_dur / n_words
+            for j in range(n_words):
+                w_starts[j] = c_start + j * step
+                w_ends[j] = c_start + (j + 1) * step
+
+        # Ensure strict monotonicity and minimum duration per word
+        cur_t = max(0.0, w_starts[0])
+        for j in range(n_words):
+            w_starts[j] = max(cur_t, w_starts[j])
+            w_ends[j] = max(w_starts[j] + 0.05, w_ends[j])
+            cur_t = w_ends[j]
+
+        chunk_start = w_starts[0]
+        chunk_end = max(chunk_start + 0.1, w_ends[-1])
 
         chunk = SubtitleChunk(
             text=chunk_text,
-            start=max(0.0, start_time),
-            end=max(start_time + 0.05, end_time),
-            words=[w["word"] for w in chunk_word_data],
-            word_starts=[w["start"] for w in chunk_word_data],
-            word_ends=[w["end"]   for w in chunk_word_data],
+            start=chunk_start,
+            end=chunk_end,
+            words=chunk_words,
+            word_starts=w_starts,
+            word_ends=w_ends,
             speaker=chunk_speaker,
         )
         result.append(chunk)
+
+    # ── Extrapolate remaining display chunks across remaining audio duration ──
+    if len(result) < len(display_chunks):
+        rem_chunks = display_chunks[len(result):]
+        last_t = result[-1].end if result else 0.0
+        target_end = max(last_t + 1.0, audio_duration if audio_duration > last_t else (timed_words[-1]["end"] if timed_words else last_t + len(rem_chunks) * 2.0))
+        rem_dur = max(0.5, target_end - last_t)
+        total_w = sum(max(1, len(c["text"].split())) for c in rem_chunks)
+        cur_t = last_t
+        for c_dict in rem_chunks:
+            c_text = c_dict["text"]
+            c_spk = c_dict["speaker"]
+            words = c_text.split()
+            w_count = max(1, len(words))
+            dur = (w_count / float(total_w)) * rem_dur
+            c_start = cur_t
+            c_end = cur_t + dur
+            w_dur = dur / w_count
+            w_starts = [c_start + j * w_dur for j in range(w_count)]
+            w_ends = [c_start + (j + 1) * w_dur for j in range(w_count)]
+            result.append(SubtitleChunk(
+                text=c_text,
+                start=max(0.0, c_start),
+                end=max(c_start + 0.05, c_end),
+                words=words,
+                word_starts=w_starts,
+                word_ends=w_ends,
+                speaker=c_spk,
+            ))
+            cur_t = c_end
 
     return result

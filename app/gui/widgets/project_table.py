@@ -24,16 +24,17 @@ from app.gui.widgets.common import StatusBadge, HealthBar, SectionHeader
 from app.gui.theme import COLORS, STATUS_COLORS
 
 
-COLUMNS    = ["", "Name", "Status", "Imgs", "Duration", "Words", "Health", "Output Path", "Actions"]
-COL_CHECK  = 0
-COL_NAME   = 1
-COL_STATUS = 2
-COL_IMAGES = 3
-COL_DUR    = 4
-COL_WORDS  = 5
-COL_HEALTH = 6
-COL_OUTPUT = 7
-COL_ACTIONS = 8
+COLUMNS     = ["", "Name", "Preset", "Status", "Imgs", "Duration", "Words", "Health", "Output Path", "Actions"]
+COL_CHECK   = 0
+COL_NAME    = 1
+COL_PRESET  = 2
+COL_STATUS  = 3
+COL_IMAGES  = 4
+COL_DUR     = 5
+COL_WORDS   = 6
+COL_HEALTH  = 7
+COL_OUTPUT  = 8
+COL_ACTIONS = 9
 
 
 def _find_checkbox(cell_widget) -> QCheckBox | None:
@@ -49,18 +50,22 @@ def _find_checkbox(cell_widget) -> QCheckBox | None:
 
 
 class ProjectTableWidget(QWidget):
-    project_selected   = Signal(str)   # project_id
-    queue_project      = Signal(str)   # project_id
-    remove_project     = Signal(str)   # project_id
-    open_folder        = Signal(str)   # project_id
-    edit_project       = Signal(str)   # project_id
-    queue_selected     = Signal(list)  # [project_id, ...]
+    project_selected      = Signal(str)   # project_id
+    queue_project         = Signal(str)   # project_id
+    remove_project        = Signal(str)   # project_id
+    open_folder           = Signal(str)   # project_id
+    edit_project          = Signal(str)   # project_id
+    queue_selected        = Signal(list)  # [project_id, ...]
+    preset_changed        = Signal(str, str)  # (project_id, preset_name)
+    batch_preset_applied  = Signal(list, str) # ([project_ids], preset_name)
+    force_align_requested = Signal(str)       # (project_id)
     add_folders_requested = Signal()
-    folders_dropped    = Signal(list)  # [path_str, ...]
+    folders_dropped       = Signal(list)  # [path_str, ...]
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._projects: dict[str, Project] = {}
+        self._available_presets: list[str] = []
         self._setup_ui()
         self.setAcceptDrops(True)
 
@@ -122,9 +127,23 @@ class ProjectTableWidget(QWidget):
         btn_add.setFixedHeight(30)
         btn_add.clicked.connect(self.add_folders_requested)
 
+        # Batch preset assignment controls
+        lbl_preset = QLabel("Preset:")
+        lbl_preset.setStyleSheet(f"color: {COLORS['text_secondary']}; font-size: 12px; margin-left: 8px;")
+        self._batch_preset_combo = QComboBox()
+        self._batch_preset_combo.setFixedHeight(30)
+        self._batch_preset_combo.setMinimumWidth(130)
+
+        btn_apply_preset = QPushButton("Apply to Selected")
+        btn_apply_preset.setFixedHeight(30)
+        btn_apply_preset.clicked.connect(self._apply_batch_preset)
+
         row2.addWidget(self._select_all_cb)
         row2.addWidget(btn_queue_sel)
         row2.addWidget(btn_remove_sel)
+        row2.addWidget(lbl_preset)
+        row2.addWidget(self._batch_preset_combo)
+        row2.addWidget(btn_apply_preset)
         row2.addStretch()
         row2.addWidget(btn_add)
         layout.addLayout(row2)
@@ -148,12 +167,13 @@ class ProjectTableWidget(QWidget):
         hdr = self._table.horizontalHeader()
         hdr.setDefaultSectionSize(90)
         hdr.resizeSection(COL_CHECK,   28)
-        hdr.resizeSection(COL_NAME,    200)
-        hdr.resizeSection(COL_STATUS,  100)
-        hdr.resizeSection(COL_IMAGES,  50)
-        hdr.resizeSection(COL_DUR,     72)
-        hdr.resizeSection(COL_WORDS,   60)
-        hdr.resizeSection(COL_HEALTH,  70)
+        hdr.resizeSection(COL_NAME,    180)
+        hdr.resizeSection(COL_PRESET,  135)
+        hdr.resizeSection(COL_STATUS,  95)
+        hdr.resizeSection(COL_IMAGES,  45)
+        hdr.resizeSection(COL_DUR,     65)
+        hdr.resizeSection(COL_WORDS,   55)
+        hdr.resizeSection(COL_HEALTH,  65)
         hdr.resizeSection(COL_ACTIONS, 195)
         hdr.setSectionResizeMode(COL_NAME,   QHeaderView.Stretch)
         hdr.setSectionResizeMode(COL_OUTPUT, QHeaderView.Stretch)
@@ -190,6 +210,14 @@ class ProjectTableWidget(QWidget):
     def set_projects(self, projects: list):
         self._projects = {p.id: p for p in projects}
         self._rebuild_table()
+
+    def set_available_presets(self, presets: list[str]):
+        self._available_presets = [p for p in presets if p]
+        if hasattr(self, "_batch_preset_combo"):
+            self._batch_preset_combo.blockSignals(True)
+            self._batch_preset_combo.clear()
+            self._batch_preset_combo.addItems(self._available_presets)
+            self._batch_preset_combo.blockSignals(False)
 
     def get_selected_project_ids(self) -> list:
         """
@@ -264,6 +292,32 @@ class ProjectTableWidget(QWidget):
         if project.status == ProjectStatus.INVALID:
             name_item.setForeground(QColor(COLORS["error"]))
         self._table.setItem(row, COL_NAME, name_item)
+
+        # ── Preset column ──────────────────────────────────────────────────────
+        preset_w = QWidget()
+        preset_lay = QHBoxLayout(preset_w)
+        preset_lay.setContentsMargins(4, 2, 4, 2)
+        preset_combo = QComboBox()
+        preset_combo.setFixedHeight(28)
+        preset_combo.setStyleSheet("font-size: 11px;")
+
+        curr_p = project.preset_name or "Default"
+        items = list(self._available_presets) if self._available_presets else ["Default"]
+        if curr_p not in items:
+            items.insert(0, curr_p)
+        preset_combo.blockSignals(True)
+        preset_combo.addItems(items)
+        preset_combo.setCurrentText(curr_p)
+        preset_combo.blockSignals(False)
+
+        def _on_p_changed(new_p, pid=project.id):
+            if project.preset_name != new_p:
+                project.preset_name = new_p
+                self.preset_changed.emit(pid, new_p)
+
+        preset_combo.currentTextChanged.connect(_on_p_changed)
+        preset_lay.addWidget(preset_combo)
+        self._table.setCellWidget(row, COL_PRESET, preset_w)
 
         # ── Status badge ───────────────────────────────────────────────────────
         badge = StatusBadge(project.status.value)
@@ -385,6 +439,19 @@ class ProjectTableWidget(QWidget):
         if item:
             self.project_selected.emit(item.data(Qt.UserRole))
 
+    def _apply_batch_preset(self):
+        sel_ids = self.get_selected_project_ids()
+        pr_name = self._batch_preset_combo.currentText().strip()
+        if sel_ids and pr_name:
+            self.batch_preset_applied.emit(sel_ids, pr_name)
+
+    def _handle_context_preset(self, pid: str, preset_name: str):
+        sel_ids = self.get_selected_project_ids()
+        if pid in sel_ids and len(sel_ids) > 1:
+            self.batch_preset_applied.emit(sel_ids, preset_name)
+        else:
+            self.preset_changed.emit(pid, preset_name)
+
     def _show_context_menu(self, pos):
         row = self._table.rowAt(pos.y())
         if row < 0:
@@ -404,6 +471,21 @@ class ProjectTableWidget(QWidget):
         if can_queue:
             menu.addAction("Queue for Rendering").triggered.connect(
                 lambda: self.queue_project.emit(pid))
+
+        # Preset submenu
+        curr_p = project.preset_name or "Default"
+        preset_menu = menu.addMenu(f"Apply Preset (Current: {curr_p})")
+        preset_list = list(self._available_presets) if self._available_presets else ["Default"]
+        if curr_p not in preset_list:
+            preset_list.insert(0, curr_p)
+        for pr_name in preset_list:
+            preset_menu.addAction(pr_name).triggered.connect(
+                lambda checked=False, p=pr_name, id_=pid: self._handle_context_preset(id_, p)
+            )
+
+        menu.addAction("⚡ Force Align Audio & Script").triggered.connect(
+            lambda: self.force_align_requested.emit(pid))
+        menu.addSeparator()
         menu.addAction("Edit Settings").triggered.connect(
             lambda: self.edit_project.emit(pid))
         menu.addAction("Open Folder").triggered.connect(
