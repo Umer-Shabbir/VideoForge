@@ -205,43 +205,58 @@ def check_ffmpeg():
         print(f"  ffprobe -> {ffprobe}")
         return
 
-    # Check bundled / common Windows locations
+    # Check bundled / common platform locations
+    bin_names = ["ffmpeg.exe", "ffmpeg"] if os.name == "nt" else ["ffmpeg"]
     locations = [
         ROOT / "ffmpeg" / "bin",
         ROOT / "bin",
-        Path("C:/ffmpeg/bin"),
-        Path("C:/Program Files/ffmpeg/bin"),
-        Path.home() / "ffmpeg/bin",
-        Path.home() / "AppData/Local/ffmpeg/bin",
+        ROOT / "ffmpeg",
     ]
+    if os.name == "nt":
+        sys_drive = os.environ.get("SystemDrive", "C:")
+        prog_files = os.environ.get("ProgramFiles", rf"{sys_drive}\Program Files")
+        locations += [
+            Path(f"{sys_drive}/ffmpeg/bin"),
+            Path(f"{prog_files}/ffmpeg/bin"),
+            Path.home() / "ffmpeg/bin",
+            Path.home() / "AppData/Local/ffmpeg/bin",
+        ]
+    else:
+        locations += [
+            Path("/usr/bin"),
+            Path("/usr/local/bin"),
+            Path("/opt/homebrew/bin"),
+            Path.home() / "bin",
+            Path.home() / ".local/bin",
+        ]
+
     for loc in locations:
-        if (loc / "ffmpeg.exe").exists():
-            print(f"  Found at: {loc}")
-            print(f"  WARNING: Not in PATH. Add {loc} to your system PATH,")
-            print(f"  OR set the path manually in VideoForge Settings -> FFmpeg & Tools.")
-            return
+        for b_name in bin_names:
+            if (loc / b_name).is_file():
+                print(f"  Found at: {loc / b_name}")
+                print(f"  WARNING: Not in PATH. Add {loc} to your system PATH,")
+                print(f"  OR set FFMPEG_PATH in .env or Settings -> FFmpeg & Tools.")
+                return
 
     print(f"  WARNING: FFmpeg not found.\n")
     print(f"  VideoForge needs FFmpeg to render videos.")
     print(f"  Install it using ONE of these methods:\n")
-    print(f"  METHOD 1 - winget (easiest, Windows 10+):")
-    print(f"    Open PowerShell and run:")
-    print(f"      winget install \"FFmpeg (Essentials Build)\"")
-    print(f"    Then close and re-open your terminal.\n")
-    print(f"  METHOD 2 - Manual:")
-    print(f"    1. Download from:")
-    print(f"       https://github.com/BtbN/FFmpeg-Builds/releases")
-    print(f"       (file: ffmpeg-master-latest-win64-gpl.zip)")
-    print(f"    2. Extract it")
-    print(f"    3. Move the folder to C:\\ffmpeg")
-    print(f"    4. Add C:\\ffmpeg\\bin to your system PATH:")
-    print(f"       Win+R -> sysdm.cpl -> Advanced -> Environment Variables")
-    print(f"       -> System variables -> Path -> Edit -> New -> C:\\ffmpeg\\bin")
-    print(f"    5. Click OK on all dialogs, restart terminal\n")
+    if os.name == "nt":
+        print(f"  METHOD 1 - winget (Windows 10+):")
+        print(f"    Open terminal and run:")
+        print(f"      winget install \"FFmpeg (Essentials Build)\"\n")
+        print(f"  METHOD 2 - Manual:")
+        print(f"    1. Download from: https://github.com/BtbN/FFmpeg-Builds/releases")
+        print(f"    2. Extract to a directory (e.g. C:\\ffmpeg)")
+        print(f"    3. Add bin folder to your PATH or set FFMPEG_PATH in .env\n")
+    else:
+        print(f"  macOS (Homebrew):")
+        print(f"    brew install ffmpeg\n")
+        print(f"  Linux (Debian / Ubuntu):")
+        print(f"    sudo apt update && sudo apt install ffmpeg\n")
     print(f"  METHOD 3 - Set in app:")
-    print(f"    Skip FFmpeg setup now. After launching VideoForge,")
-    print(f"    go to Settings (gear icon) -> FFmpeg & Tools -> Browse")
-    print(f"    and select your ffmpeg.exe file directly.\n")
+    print(f"    After launching VideoForge, go to Settings -> FFmpeg & Tools -> Browse")
+    print(f"    and select your ffmpeg binary directly.\n")
     print(f"  You can continue setup and install FFmpeg later.")
 
 

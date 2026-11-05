@@ -381,6 +381,125 @@ class TestBuildKaraokeLine:
         assert line.endswith("word")
 
 
+class TestAlignWhisperSegmentsSynchronization:
+
+    def test_align_whisper_segments_word_count_matches(self):
+        from app.subtitles.segmenter import align_whisper_segments
+        from app.core.project import SubtitleMode
+
+        timed_words = [
+            {"word": "The", "start": 0.1, "end": 0.3},
+            {"word": "ancient", "start": 0.35, "end": 0.7},
+            {"word": "monument", "start": 0.75, "end": 1.2},
+            {"word": "stands", "start": 1.25, "end": 1.6},
+            {"word": "tall", "start": 1.65, "end": 2.0},
+            {"word": "against", "start": 2.05, "end": 2.4},
+            {"word": "the", "start": 2.45, "end": 2.6},
+            {"word": "desert", "start": 2.65, "end": 3.0},
+            {"word": "sky.", "start": 3.05, "end": 3.5},
+        ]
+
+        chunks = align_whisper_segments(timed_words, mode=SubtitleMode.KARAOKE, max_chars=20)
+        assert len(chunks) >= 2
+        for c in chunks:
+            expected_n = len(c.text.split())
+            assert len(c.words) == expected_n, f"Chunk words {c.words} does not match text split for '{c.text}'"
+            assert len(c.word_starts) == expected_n, f"word_starts len {len(c.word_starts)} != {expected_n}"
+            assert len(c.word_ends) == expected_n, f"word_ends len {len(c.word_ends)} != {expected_n}"
+            # Verify monotonicity
+            for j in range(len(c.word_starts)):
+                assert c.word_ends[j] >= c.word_starts[j]
+                if j > 0:
+                    assert c.word_starts[j] >= c.word_starts[j - 1]
+
+    def test_align_whisper_segments_handles_missing_whisper_words_without_drift(self):
+        from app.subtitles.segmenter import align_whisper_segments
+        from app.core.project import SubtitleMode
+
+        # Transcript has "We will definitely succeed today"
+        # Whisper missed "definitely"
+        timed_words = [
+            {"word": "We", "start": 0.0, "end": 0.2},
+            {"word": "will", "start": 0.25, "end": 0.45},
+            {"word": "succeed", "start": 0.8, "end": 1.2},
+            {"word": "today", "start": 1.3, "end": 1.7},
+        ]
+        transcript_segs = [
+            {"text": "We will definitely", "speaker": "Narrator"},
+            {"text": "succeed today", "speaker": "Narrator"}
+        ]
+
+        chunks = align_whisper_segments(
+            timed_words,
+            mode=SubtitleMode.KARAOKE,
+            transcript_segments=transcript_segs,
+            audio_duration=2.0
+        )
+        assert len(chunks) == 2
+        # Chunk 1: "We will definitely"
+        c1 = chunks[0]
+        assert len(c1.words) == 3
+        assert len(c1.word_starts) == 3
+        assert len(c1.word_ends) == 3
+        assert c1.words == ["We", "will", "definitely"]
+        # "definitely" interpolated after "will"
+        assert c1.word_starts[2] >= c1.word_ends[1]
+
+        # Chunk 2: "succeed today"
+        c2 = chunks[1]
+        assert c2.words == ["succeed", "today"]
+        assert c2.word_starts[0] >= 0.8  # precisely locks to Whisper audio start of "succeed"
+
+
+class TestEffectsEngine:
+
+    def test_sanitize_transition_name(self):
+        from app.render.effects import sanitize_transition_name
+        from app.core.project import TransitionType
+
+        assert sanitize_transition_name(TransitionType.FADE) == "fade"
+        assert sanitize_transition_name(TransitionType.WIPE_LEFT) == "wipeleft"
+        assert sanitize_transition_name("DISSOLVE") == "dissolve"
+        assert sanitize_transition_name("invalid_nonexistent") == "fade"
+
+    def test_clamp_transition_duration(self):
+        from app.render.effects import clamp_transition_duration
+
+        # 30% rule: min(0.5, 0.3 * 1.0, 0.3 * 2.0) = 0.30
+        assert abs(clamp_transition_duration(1.0, 2.0, base_duration=0.5) - 0.30) < 0.001
+        # Normal duration fits
+        assert abs(clamp_transition_duration(4.0, 5.0, base_duration=0.5) - 0.50) < 0.001
+        # Minimum safety clamp
+        assert clamp_transition_duration(0.01, 0.01, base_duration=0.5) >= 0.04
+
+    def test_build_fit_filter(self):
+        from app.render.effects import build_fit_filter
+
+        cover = build_fit_filter("cover", 1920, 1080)
+        assert "scale=1920:1080" in cover
+        assert "crop=1920:1080" in cover
+
+        contain = build_fit_filter("contain", 1080, 1920)
+        assert "pad=1080:1920" in contain
+
+    def test_build_xfade_chain(self):
+        from app.render.effects import build_xfade_chain
+        from app.render.timeline import ImageSlot
+        from pathlib import Path
+
+        slots = [
+            ImageSlot(image_path=Path("img1.png"), index=0, display_duration=2.0, segment_duration=2.5, start_time=0.0),
+            ImageSlot(image_path=Path("img2.png"), index=1, display_duration=3.0, segment_duration=3.0, start_time=2.0),
+        ]
+        fc_parts = []
+        final_stream, total_dur = build_xfade_chain(fc_parts, 2, slots, default_trans="fade", base_trans_dur=0.5)
+        assert final_stream == "vout"
+        assert len(fc_parts) == 1
+        assert "xfade=transition=fade" in fc_parts[0]
+        assert total_dur == 5.0
+
+
 if __name__ == "__main__":
     import pytest as _pytest
     _pytest.main([__file__, "-v"])
+
