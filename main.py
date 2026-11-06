@@ -5,9 +5,38 @@ Main entry point. Run: python main.py
 
 import sys
 import os
+from pathlib import Path
+
+
+def _load_env_file():
+    """Load key-value pairs from .env into os.environ if present."""
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+        return
+    except ImportError:
+        pass
+
+    # Built-in fallback parser if python-dotenv is not installed
+    for env_path in (Path.cwd() / ".env", Path(__file__).resolve().parent / ".env"):
+        if env_path.is_file():
+            try:
+                for line in env_path.read_text(encoding="utf-8").splitlines():
+                    line = line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    k, v = line.split("=", 1)
+                    k = k.strip()
+                    v = v.strip().strip("'\"")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+            except Exception:
+                pass
+            break
 
 
 def main():
+    _load_env_file()
     # ── Windows: UTF-8 console output ─────────────────────────────────────────
     if os.name == "nt":
         if sys.stdout and hasattr(sys.stdout, "reconfigure"):
